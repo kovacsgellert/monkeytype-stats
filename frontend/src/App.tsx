@@ -10,8 +10,8 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <h1>MonkeyType Stats</h1>
+    <div className="flex items-center justify-center min-h-screen flex-col">
+      <h1 className="text-3xl font-extrabold ">MonkeyType Stats</h1>
       <p>API status: {status}</p>
     </div>
   );
