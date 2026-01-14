@@ -4,15 +4,15 @@ function App() {
   const [status, setStatus] = useState("");
 
   useEffect(() => {
-    fetch("/api/stats")
+    fetch("/api/results")
       .then((res) => res.json())
-      .then((data) => setStatus(data.message));
+      .then((data) => setStatus(data.results));
   }, []);
 
   return (
     <div className="flex items-center justify-center min-h-screen flex-col">
       <h1 className="text-3xl font-extrabold ">MonkeyType Stats</h1>
-      <p>API status: {status}</p>
+      <p>API results: {status}</p>
     </div>
   );
 }
