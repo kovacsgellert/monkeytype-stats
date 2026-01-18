@@ -7,8 +7,8 @@ export default defineConfig(({ mode }) => {
 
   // Prefer Aspire-injected env, fallback to .env
   const apiUrl =
-    env.services__api__https__0 ||
-    env.services__api__http__0 ||
+    env["services__monkeytype-stats-api__https__0"] ||
+    env["services__monkeytype-stats-api__http__0"] ||
     env.VITE_API_URL;
 
   return {

@@ -7,6 +7,17 @@ builder.Services.AddOpenApi();
 
 var monkeyTypeApiConfig = builder.Configuration.GetSection("MonkeyTypeApi");
 
+if (
+    monkeyTypeApiConfig is null
+    || string.IsNullOrEmpty(monkeyTypeApiConfig["BaseUrl"])
+    || string.IsNullOrEmpty(monkeyTypeApiConfig["ApeKey"])
+)
+{
+    throw new InvalidOperationException(
+        "MonkeyTypeApi configuration section is missing or incomplete."
+    );
+}
+
 builder.Services.AddHttpClient<MonkeyTypeApiClient>(client =>
 {
     client.BaseAddress = new Uri(monkeyTypeApiConfig["BaseUrl"]!);

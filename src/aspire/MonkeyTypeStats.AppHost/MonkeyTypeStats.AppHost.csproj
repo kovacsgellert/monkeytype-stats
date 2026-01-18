@@ -1,5 +1,4 @@
 <Project Sdk="Aspire.AppHost.Sdk/13.1.0">
-
   <ItemGroup>
     <ProjectReference Include="..\..\backend\MonkeyTypeStats.Api\MonkeyTypeStats.Api.csproj" />
   </ItemGroup>
@@ -16,5 +15,4 @@
     <Nullable>enable</Nullable>
     <UserSecretsId>c62b8717-1107-449b-97a7-b66962af0047</UserSecretsId>
   </PropertyGroup>
-
 </Project>
