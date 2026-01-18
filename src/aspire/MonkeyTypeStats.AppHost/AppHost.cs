@@ -8,6 +8,9 @@ var api = builder
     .AddProject<Projects.MonkeyTypeStats_Api>("monkeytype-stats-api")
     .WithReference(db);
 
-var frontend = builder.AddViteApp("monkeytype-stats-frontend", "../../frontend").WithReference(api);
+var frontend = builder
+    .AddViteApp("monkeytype-stats-frontend", "../../frontend")
+    .WithEndpoint("http", endpoint => endpoint.Port = 3000)
+    .WithReference(api);
 
 builder.Build().Run();
