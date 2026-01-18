@@ -1,4 +1,6 @@
+using MediatR;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
+using MonkeyTypeStats.Api.Queries;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,8 @@ builder.Services.AddHttpClient<MonkeyTypeApiClient>(client =>
     client.DefaultRequestHeaders.Add("Authorization", $"ApeKey {monkeyTypeApiConfig["ApeKey"]}");
 });
 
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,11 +39,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet(
-        "/api/results",
-        async (MonkeyTypeApiClient monkeyTypeApiClient) =>
-            await monkeyTypeApiClient.GetResultsAsync()
-    )
-    .WithName("GetStats");
+app.MapGet("/api/results", async (IMediator mediator) => await mediator.Send(new GetResultsQuery()))
+    .WithName("GetResults");
 
 app.Run();
