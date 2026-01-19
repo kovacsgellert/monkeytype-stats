@@ -1,10 +1,6 @@
-namespace MonkeyTypeStats.Api.MonkeyTypeIntegration.Models;
+using System.Text.Json.Serialization;
 
-public record GetResultsResponse
-{
-    public string Message { get; set; } = string.Empty;
-    public List<TestResult> Data { get; set; } = [];
-}
+namespace MonkeyTypeStats.Api.MonkeyTypeIntegration.Models;
 
 public record TestResult
 {
@@ -32,6 +28,8 @@ public record TestResult
     public string Difficulty { get; set; } = string.Empty;
     public bool Numbers { get; set; }
     public bool Punctuation { get; set; }
-    public string _id { get; set; } = string.Empty;
+
+    [JsonPropertyName("_id")]
+    public string Id { get; set; } = string.Empty;
     public bool IsPb { get; set; }
 }

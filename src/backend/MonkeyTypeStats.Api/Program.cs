@@ -1,6 +1,6 @@
 using MediatR;
+using MonkeyTypeStats.Api.Features.Results.Get;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
-using MonkeyTypeStats.Api.Queries;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
