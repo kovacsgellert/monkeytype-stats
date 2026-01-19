@@ -6,7 +6,8 @@ var db = postgres.AddDatabase("monkeytype-stats-db");
 
 var api = builder
     .AddProject<Projects.MonkeyTypeStats_Api>("monkeytype-stats-api")
-    .WithReference(db);
+    .WithReference(db)
+    .WaitFor(db);
 
 var frontend = builder
     .AddViteApp("monkeytype-stats-frontend", "../../frontend")
