@@ -1,10 +1,10 @@
 using Hangfire;
 using MediatR;
+using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Results.Get;
 using MonkeyTypeStats.Api.Features.Results.Import;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
-using MonkeyTypeStats.Api.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,7 +35,6 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Pr
 builder.AddNpgsqlDbContext<MonkeyTypeStatsDbContext>("monkeytype-stats-db");
 
 // Register services
-builder.Services.AddSingleton<ResultsFileService>();
 builder.Services.AddScoped<DbMigrator>();
 
 builder.Services.AddHangfire(config =>
@@ -81,9 +80,7 @@ app.MapGet(
         async (IMediator mediator) =>
         {
             var result = await mediator.Send(new GetResultsQuery());
-            return result is null
-                ? Results.NotFound("No results file found. Wait for the daily import job to run.")
-                : Results.Ok(result);
+            return result.ToResult();
         }
     )
     .WithName("GetResults");

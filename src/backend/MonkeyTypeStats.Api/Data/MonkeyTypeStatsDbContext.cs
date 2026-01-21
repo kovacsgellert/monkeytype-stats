@@ -39,9 +39,9 @@ public class MonkeyTypeStatsDbContext : DbContext
 
             entity.Property(e => e.Uid).IsRequired().HasMaxLength(100);
 
-            entity.Property(e => e.Language).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Language).HasMaxLength(50);
 
-            entity.Property(e => e.Difficulty).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Difficulty).HasMaxLength(50);
 
             entity.Property(e => e.CharStats).HasColumnType("integer[]");
 

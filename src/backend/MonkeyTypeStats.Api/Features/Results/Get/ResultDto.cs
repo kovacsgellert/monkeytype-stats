@@ -1,0 +1,30 @@
+namespace MonkeyTypeStats.Api.Features.Results.Get;
+
+public record ResultDto(
+    string Id,
+    double Wpm,
+    double RawWpm,
+    int[] CharStats,
+    double Acc,
+    string Mode,
+    string Mode2,
+    int? QuoteLength,
+    DateTime Timestamp,
+    double TestDuration,
+    double Consistency,
+    double KeyConsistency,
+    string Uid,
+    int? RestartCount,
+    double? IncompleteTestSeconds,
+    double? AfkDuration,
+    string[]? Tags,
+    bool? BailedOut,
+    bool? BlindMode,
+    bool? LazyMode,
+    string[]? Funbox,
+    string? Language,
+    string? Difficulty,
+    bool? Numbers,
+    bool? Punctuation,
+    bool? IsPb
+);

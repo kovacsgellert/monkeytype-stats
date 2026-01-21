@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MonkeyTypeStats.Api.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MonkeyTypeStats.Api.Migrations
 {
     [DbContext(typeof(MonkeyTypeStatsDbContext))]
-    partial class MonkeyTypeStatsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260121184700_MakeResultFieldsNullable")]
+    partial class MakeResultFieldsNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,6 +74,7 @@ namespace MonkeyTypeStats.Api.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<string>("Difficulty")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
@@ -87,6 +91,7 @@ namespace MonkeyTypeStats.Api.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<string>("Language")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
