@@ -1,9 +1,9 @@
 <Solution>
-  <Folder Name="/backend/">
-    <Project Path="src/backend/MonkeyTypeStats.Api/MonkeyTypeStats.Api.csproj" />
-  </Folder>
-  <Folder Name="/aspire/">
-    <Project Path="src/aspire/MonkeyTypeStats.AppHost/MonkeyTypeStats.AppHost.csproj" />
-    <Project Path="src/aspire/MonkeyTypeStats.ServiceDefaults/MonkeyTypeStats.ServiceDefaults.csproj" />
-  </Folder>
+    <Folder Name="/backend/">
+        <Project Path="src/backend/MonkeyTypeStats.Api/MonkeyTypeStats.Api.csproj" />
+    </Folder>
+    <Folder Name="/aspire/">
+        <Project Path="src/aspire/MonkeyTypeStats.AppHost/MonkeyTypeStats.AppHost.csproj" />
+        <Project Path="src/aspire/MonkeyTypeStats.ServiceDefaults/MonkeyTypeStats.ServiceDefaults.csproj" />
+    </Folder>
 </Solution>
