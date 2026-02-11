@@ -1,6 +1,9 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var postgres = builder.AddPostgres("postgres").WithPgAdmin();
+var postgres = builder
+    .AddPostgres("postgres")
+    .WithPgAdmin((container) => container.WithHostPort(4002))
+    .WithDataVolume("monkeytype-stats-data");
 
 var db = postgres.AddDatabase("monkeytype-stats-db");
 
