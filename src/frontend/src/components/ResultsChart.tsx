@@ -21,9 +21,22 @@ ChartJS.register(
   Filler,
 );
 
-interface WpmChartProps {
+interface ResultsChartProps {
   results: Result[];
 }
+
+type Metric = "wpm" | "acc" | "consistency";
+
+const metrics: { key: Metric; label: string; unit: string; color: string }[] = [
+  { key: "wpm", label: "WPM", unit: " WPM", color: "rgb(6, 182, 212)" },
+  { key: "acc", label: "Accuracy", unit: "%", color: "rgb(244, 114, 182)" },
+  {
+    key: "consistency",
+    label: "Consistency",
+    unit: "%",
+    color: "rgb(168, 85, 247)",
+  },
+];
 
 function rollingAverage(values: number[], window: number): number[] {
   return values.map((_, i) => {
@@ -35,14 +48,17 @@ function rollingAverage(values: number[], window: number): number[] {
 
 const pillBase =
   "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200";
-const pillActive = (color: string) =>
-  `${color} border border-current/50`;
+const pillActive = (color: string) => `${color} border border-current/50`;
 const pillInactive =
   "bg-zinc-800/50 text-zinc-400 border border-zinc-700/50 hover:bg-zinc-700/50 hover:text-zinc-300";
+const metricActive = "bg-cyan-500/20 text-cyan-400 border border-cyan-500/50";
 
-export function WpmChart({ results }: WpmChartProps) {
+export function ResultsChart({ results }: ResultsChartProps) {
+  const [selectedMetric, setSelectedMetric] = useState<Metric>("wpm");
   const [showAvg10, setShowAvg10] = useState(false);
   const [showAvg100, setShowAvg100] = useState(false);
+
+  const activeMetric = metrics.find((m) => m.key === selectedMetric)!;
 
   const chartData = useMemo(() => {
     const sorted = [...results].sort(
@@ -57,19 +73,28 @@ export function WpmChart({ results }: WpmChartProps) {
       }),
     );
 
-    const wpmValues = sorted.map((r) => Math.round(r.wpm));
+    const values = sorted.map((r) => {
+      const v = r[selectedMetric];
+      return selectedMetric === "wpm" ? Math.round(v) : Number(v.toFixed(1));
+    });
 
     const datasets: ChartDataset<"line", number[]>[] = [
       {
-        label: "WPM",
-        data: wpmValues,
+        label: activeMetric.label,
+        data: values,
         borderColor: "transparent",
-        backgroundColor: "rgba(6, 182, 212, 0.5)",
+        backgroundColor: activeMetric.color
+          .replace(")", ", 0.5)")
+          .replace("rgb(", "rgba("),
         borderWidth: 0,
         pointRadius: 3,
         pointHoverRadius: 5,
-        pointBackgroundColor: "rgba(6, 182, 212, 0.5)",
-        pointBorderColor: "rgba(6, 182, 212, 0.5)",
+        pointBackgroundColor: activeMetric.color
+          .replace(")", ", 0.5)")
+          .replace("rgb(", "rgba("),
+        pointBorderColor: activeMetric.color
+          .replace(")", ", 0.5)")
+          .replace("rgb(", "rgba("),
         showLine: false,
         fill: false,
       },
@@ -78,7 +103,7 @@ export function WpmChart({ results }: WpmChartProps) {
     if (showAvg10) {
       datasets.push({
         label: "Avg 10",
-        data: rollingAverage(wpmValues, 10),
+        data: rollingAverage(values, 10),
         borderColor: "rgb(250, 204, 21)",
         backgroundColor: "transparent",
         borderWidth: 2,
@@ -92,8 +117,8 @@ export function WpmChart({ results }: WpmChartProps) {
     if (showAvg100) {
       datasets.push({
         label: "Avg 100",
-        data: rollingAverage(wpmValues, 100),
-        borderColor: "rgb(168, 85, 247)",
+        data: rollingAverage(values, 100),
+        borderColor: "rgb(52, 211, 153)",
         backgroundColor: "transparent",
         borderWidth: 2,
         pointRadius: 0,
@@ -104,13 +129,23 @@ export function WpmChart({ results }: WpmChartProps) {
     }
 
     return { labels, datasets };
-  }, [results, showAvg10, showAvg100]);
+  }, [results, selectedMetric, activeMetric, showAvg10, showAvg100]);
 
   if (results.length === 0) return null;
 
   return (
     <div className="mb-8 rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-6 backdrop-blur-sm">
-      <h3 className="text-sm font-medium text-zinc-400 mb-4">WPM Over Time</h3>
+      <div className="flex items-center gap-2 mb-4">
+        {metrics.map((m) => (
+          <button
+            key={m.key}
+            onClick={() => setSelectedMetric(m.key)}
+            className={`${pillBase} ${selectedMetric === m.key ? metricActive : pillInactive}`}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
       <div className="h-64">
         <Line
           data={chartData}
@@ -137,12 +172,13 @@ export function WpmChart({ results }: WpmChartProps) {
               tooltip: {
                 backgroundColor: "rgb(24, 24, 27)",
                 titleColor: "rgb(228, 228, 231)",
-                bodyColor: "rgb(6, 182, 212)",
+                bodyColor: activeMetric.color,
                 borderColor: "rgba(63, 63, 70, 0.5)",
                 borderWidth: 1,
                 padding: 10,
                 callbacks: {
-                  label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y} WPM`,
+                  label: (ctx) =>
+                    `${ctx.dataset.label}: ${ctx.parsed.y}${activeMetric.unit}`,
                 },
               },
             },
@@ -158,7 +194,7 @@ export function WpmChart({ results }: WpmChartProps) {
         </button>
         <button
           onClick={() => setShowAvg100((v) => !v)}
-          className={`${pillBase} ${showAvg100 ? pillActive("bg-purple-400/20 text-purple-400") : pillInactive}`}
+          className={`${pillBase} ${showAvg100 ? pillActive("bg-emerald-400/20 text-emerald-400") : pillInactive}`}
         >
           Avg 100
         </button>

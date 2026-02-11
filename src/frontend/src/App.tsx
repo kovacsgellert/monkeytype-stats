@@ -6,7 +6,7 @@ import { LoadingSkeleton } from "./components/LoadingSkeleton";
 import { ModeFilter } from "./components/ModeFilter";
 import { LanguageFilter } from "./components/LanguageFilter";
 import { PeriodFilter } from "./components/PeriodFilter";
-import { WpmChart } from "./components/WpmChart";
+import { ResultsChart } from "./components/ResultsChart";
 
 function App() {
   const { data, isLoading, isError, error, refetch } = useResults();
@@ -213,7 +213,7 @@ function App() {
                 onLanguageChange={setSelectedLanguage}
               />
               <StatsSummary results={filteredResults} />
-              <WpmChart results={filteredResults} />
+              <ResultsChart results={filteredResults} />
               <ResultsTable results={filteredResults} />
             </>
           ) : null}
