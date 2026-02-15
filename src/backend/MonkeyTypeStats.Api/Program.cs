@@ -69,7 +69,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Register the recurring job to run daily at midnight UTC
-RecurringJob.AddOrUpdate<ImportResultsJob>(
+var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
+recurringJobManager.AddOrUpdate<ImportResultsJob>(
     "import-monkeytype-results",
     job => job.ExecuteAsync(),
     Cron.Daily

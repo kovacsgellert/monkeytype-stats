@@ -9,12 +9,13 @@ export default defineConfig(({ mode }) => {
   const apiUrl =
     env["services__monkeytype-stats-api__https__0"] ||
     env["services__monkeytype-stats-api__http__0"] ||
-    env.VITE_API_URL;
+    env.MONKEYTYPE_STATS_API_HTTPS ||
+    env.MONKEYTYPE_STATS_API_HTTP;
 
   return {
     plugins: [react(), tailwindcss()],
     server: {
-      port: Number(process.env.VITE_PORT) || 3000,
+      port: Number(process.env.MONKEYTYPE_STATS_FRONTEND_PORT) || 3000,
       proxy: {
         "/api": {
           target: apiUrl,

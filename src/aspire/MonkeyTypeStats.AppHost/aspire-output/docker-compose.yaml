@@ -1,0 +1,77 @@
+services:
+  monkeytype-stats-env-dashboard:
+    image: "mcr.microsoft.com/dotnet/nightly/aspire-dashboard:latest"
+    ports:
+      - "18888"
+    expose:
+      - "18889"
+      - "18890"
+    networks:
+      - "aspire"
+    restart: "always"
+  postgres:
+    image: "docker.io/library/postgres:17.6"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    expose:
+      - "5432"
+    volumes:
+      - type: "volume"
+        target: "/var/lib/postgresql/data"
+        source: "monkeytype-stats-data"
+        read_only: false
+    networks:
+      - "aspire"
+  monkeytype-stats-api:
+    image: "${MONKEYTYPE_STATS_API_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "${MONKEYTYPE_STATS_API_PORT}"
+      ConnectionStrings__monkeytype-stats-db: "Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=monkeytype-stats-db"
+      MONKEYTYPE_STATS_DB_HOST: "postgres"
+      MONKEYTYPE_STATS_DB_PORT: "5432"
+      MONKEYTYPE_STATS_DB_USERNAME: "postgres"
+      MONKEYTYPE_STATS_DB_PASSWORD: "${POSTGRES_PASSWORD}"
+      MONKEYTYPE_STATS_DB_URI: "postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/monkeytype-stats-db"
+      MONKEYTYPE_STATS_DB_JDBCCONNECTIONSTRING: "jdbc:postgresql://postgres:5432/monkeytype-stats-db"
+      MONKEYTYPE_STATS_DB_DATABASENAME: "monkeytype-stats-db"
+      MonkeyTypeApi__BaseUrl: "https://api.monkeytype.com"
+      MonkeyTypeApi__ApeKey: "${MONKEYTYPE_APE_KEY}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://monkeytype-stats-env-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "monkeytype-stats-api"
+    expose:
+      - "${MONKEYTYPE_STATS_API_PORT}"
+    depends_on:
+      postgres:
+        condition: "service_started"
+    networks:
+      - "aspire"
+  monkeytype-stats-frontend:
+    image: "${MONKEYTYPE_STATS_FRONTEND_IMAGE}"
+    environment:
+      NODE_ENV: "production"
+      PORT: "3000"
+      MONKEYTYPE_STATS_FRONTEND_PORT: "3000"
+      MONKEYTYPE_STATS_API_HTTP: "http://monkeytype-stats-api:${MONKEYTYPE_STATS_API_PORT}"
+      services__monkeytype-stats-api__http__0: "http://monkeytype-stats-api:${MONKEYTYPE_STATS_API_PORT}"
+      MONKEYTYPE_STATS_API_HTTPS: "https://monkeytype-stats-api:${MONKEYTYPE_STATS_API_PORT}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://monkeytype-stats-env-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "monkeytype-stats-frontend"
+    ports:
+      - "3000:3000"
+    networks:
+      - "aspire"
+networks:
+  aspire:
+    driver: "bridge"
+volumes:
+  monkeytype-stats-data:
+    driver: "local"
