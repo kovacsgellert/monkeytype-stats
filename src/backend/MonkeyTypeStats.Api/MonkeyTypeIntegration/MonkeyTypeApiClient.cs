@@ -19,7 +19,7 @@ public class MonkeyTypeApiClient
         _logger = logger;
     }
 
-    public async Task<MonkeyTypeResultsResponse> GetResultsAsync()
+    public async Task<MonkeyTypeApiResultsResponse> GetResultsAsync()
     {
         var response = await _httpClient.GetAsync("/results");
 
@@ -44,7 +44,7 @@ public class MonkeyTypeApiClient
             throw new InvalidOperationException("Parsed MonkeyType results response is null.");
         }
 
-        return new MonkeyTypeResultsResponse
+        return new MonkeyTypeApiResultsResponse
         {
             RawResponse = content,
             ParsedResponse = parsedResponse,

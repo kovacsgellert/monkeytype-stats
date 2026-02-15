@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace MonkeyTypeStats.Api.Migrations
+namespace MonkeyTypeStats.Api.Data.Migrations
 {
     /// <inheritdoc />
     public partial class CreateResultsTable : Migration
