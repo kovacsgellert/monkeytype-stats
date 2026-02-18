@@ -3,6 +3,7 @@ using MediatR;
 using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Results.Get;
+using MonkeyTypeStats.Api.Features.Results.GetById;
 using MonkeyTypeStats.Api.Features.Results.Import;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
 using Scalar.AspNetCore;
@@ -48,6 +49,7 @@ builder.Services.AddHangfire(config =>
 builder.Services.AddHangfireServer();
 
 builder.Services.AddScoped<ImportResultsJob>();
+builder.Services.AddScoped<ImportResultDetailsJob>();
 
 var app = builder.Build();
 
@@ -76,6 +78,12 @@ recurringJobManager.AddOrUpdate<ImportResultsJob>(
     Cron.Daily
 );
 
+recurringJobManager.AddOrUpdate<ImportResultDetailsJob>(
+    "import-monkeytype-result-details",
+    job => job.ExecuteAsync(),
+    Cron.Hourly
+);
+
 app.MapGet(
         "/api/results",
         async (IMediator mediator) =>
@@ -85,5 +93,15 @@ app.MapGet(
         }
     )
     .WithName("GetResults");
+
+app.MapGet(
+        "/api/results/{id}",
+        async (string id, IMediator mediator) =>
+        {
+            var result = await mediator.Send(new GetResultByIdQuery(id));
+            return result.ToResult();
+        }
+    )
+    .WithName("GetResultById");
 
 app.Run();

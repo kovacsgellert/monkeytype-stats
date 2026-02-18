@@ -57,35 +57,7 @@ public class ImportResultsJob
             // Filter out already existing results
             var newResults = resultsData
                 .Where(r => !existingResultIds.Contains(r.Id))
-                .Select(r => new Result
-                {
-                    Id = r.Id,
-                    Wpm = r.Wpm,
-                    RawWpm = r.RawWpm,
-                    CharStats = r.CharStats,
-                    Acc = r.Acc,
-                    Mode = r.Mode,
-                    Mode2 = r.Mode2,
-                    QuoteLength = r.QuoteLength,
-                    Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(r.Timestamp).UtcDateTime,
-                    TestDuration = r.TestDuration,
-                    Consistency = r.Consistency,
-                    KeyConsistency = r.KeyConsistency,
-                    Uid = r.Uid,
-                    RestartCount = r.RestartCount,
-                    IncompleteTestSeconds = r.IncompleteTestSeconds,
-                    AfkDuration = r.AfkDuration,
-                    Tags = r.Tags,
-                    BailedOut = r.BailedOut,
-                    BlindMode = r.BlindMode,
-                    LazyMode = r.LazyMode,
-                    Funbox = r.Funbox,
-                    Language = r.Language,
-                    Difficulty = r.Difficulty,
-                    Numbers = r.Numbers,
-                    Punctuation = r.Punctuation,
-                    IsPb = r.IsPb,
-                })
+                .Select(r => r.ToResultEntity())
                 .ToList();
 
             if (newResults.Count > 0)

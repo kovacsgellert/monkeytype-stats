@@ -7,37 +7,45 @@ import { ModeFilter } from "./components/ModeFilter";
 import { LanguageFilter } from "./components/LanguageFilter";
 import { PeriodFilter } from "./components/PeriodFilter";
 import { ResultsChart } from "./components/ResultsChart";
+import { ResultDetailsModal } from "./components/ResultDetailsModal";
+import type { Result } from "./types/result";
+import { useResultDetails } from "./hooks/useResultDetails";
 
 function App() {
-  const { data, isLoading, isError, error, refetch } = useResults();
+  const resultsQuery = useResults();
+  const resultsData = useMemo(
+    () => resultsQuery.data?.data ?? [],
+    [resultsQuery.data?.data],
+  );
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
   const [selectedMode2, setSelectedMode2] = useState<string | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
+  const [selectedResult, setSelectedResult] = useState<Result | null>(null);
+  const selectedResultId = selectedResult?.id ?? null;
+  const resultDetailsQuery = useResultDetails(selectedResultId);
 
   // Unique years derived from the data, sorted descending
   const years = useMemo(() => {
-    if (!data?.data) return [];
     const unique = [
-      ...new Set(data.data.map((r) => new Date(r.timestamp).getFullYear())),
+      ...new Set(resultsData.map((r) => new Date(r.timestamp).getFullYear())),
     ];
     return unique.sort((a, b) => b - a);
-  }, [data?.data]);
+  }, [resultsData]);
 
   // Unique top-level modes (e.g. "time", "words", "quote")
   const modes = useMemo(() => {
-    if (!data?.data) return [];
-    return [...new Set(data.data.map((r) => r.mode))].sort();
-  }, [data?.data]);
+    return [...new Set(resultsData.map((r) => r.mode))].sort();
+  }, [resultsData]);
 
   // Mode2 options for the currently selected mode
   const mode2Options = useMemo(() => {
-    if (!data?.data || selectedMode === null) return [];
+    if (selectedMode === null) return [];
     // Quote mode has no meaningful mode2 distinction
     if (selectedMode === "quote") return [];
     const options = [
       ...new Set(
-        data.data.filter((r) => r.mode === selectedMode).map((r) => r.mode2),
+        resultsData.filter((r) => r.mode === selectedMode).map((r) => r.mode2),
       ),
     ];
     return options.sort((a, b) => {
@@ -46,7 +54,7 @@ function App() {
       if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
       return a.localeCompare(b);
     });
-  }, [data?.data, selectedMode]);
+  }, [resultsData, selectedMode]);
 
   // When mode changes, reset mode2
   const handleModeChange = useCallback((mode: string | null) => {
@@ -56,14 +64,14 @@ function App() {
 
   // Unique languages derived from the data (null/missing treated as "english")
   const languages = useMemo(() => {
-    if (!data?.data) return [];
-    const unique = [...new Set(data.data.map((r) => r.language ?? "english"))];
+    const unique = [
+      ...new Set(resultsData.map((r) => r.language ?? "english")),
+    ];
     return unique.sort();
-  }, [data?.data]);
+  }, [resultsData]);
 
   const filteredResults = useMemo(() => {
-    if (!data?.data) return [];
-    let results = data.data;
+    let results = resultsData;
     if (selectedPeriod === "last-month") {
       const now = new Date();
       const cutoff = new Date(
@@ -90,7 +98,21 @@ function App() {
       );
     }
     return results;
-  }, [data?.data, selectedPeriod, selectedMode, selectedMode2, selectedLanguage]);
+  }, [
+    resultsData,
+    selectedPeriod,
+    selectedMode,
+    selectedMode2,
+    selectedLanguage,
+  ]);
+
+  const handleResultSelect = useCallback((result: Result) => {
+    setSelectedResult(result);
+  }, []);
+
+  const handleCloseDetails = useCallback(() => {
+    setSelectedResult(null);
+  }, []);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -134,12 +156,12 @@ function App() {
               </div>
             </div>
             <button
-              onClick={() => refetch()}
-              disabled={isLoading}
+              onClick={() => resultsQuery.refetch()}
+              disabled={resultsQuery.isLoading}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-sm font-medium text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg
-                className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+                className={`w-4 h-4 ${resultsQuery.isLoading ? "animate-spin" : ""}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -158,9 +180,9 @@ function App() {
 
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-6 py-8">
-          {isLoading ? (
+          {resultsQuery.isLoading ? (
             <LoadingSkeleton />
-          ) : isError ? (
+          ) : resultsQuery.isError ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mb-4">
                 <svg
@@ -181,18 +203,18 @@ function App() {
                 Failed to load results
               </h2>
               <p className="text-zinc-500 mb-6 text-center max-w-md">
-                {error instanceof Error
-                  ? error.message
+                {resultsQuery.error instanceof Error
+                  ? resultsQuery.error.message
                   : "An unexpected error occurred"}
               </p>
               <button
-                onClick={() => refetch()}
+                onClick={() => resultsQuery.refetch()}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg shadow-cyan-500/20"
               >
                 Try Again
               </button>
             </div>
-          ) : data?.data ? (
+          ) : resultsData.length ? (
             <>
               <PeriodFilter
                 years={years}
@@ -214,7 +236,10 @@ function App() {
               />
               <StatsSummary results={filteredResults} />
               <ResultsChart results={filteredResults} />
-              <ResultsTable results={filteredResults} />
+              <ResultsTable
+                results={filteredResults}
+                onSelectResult={handleResultSelect}
+              />
             </>
           ) : null}
         </main>
@@ -222,6 +247,24 @@ function App() {
         {/* Footer */}
         <footer className="border-t border-zinc-800/50 mt-12"></footer>
       </div>
+
+      {selectedResult ? (
+        <ResultDetailsModal
+          details={resultDetailsQuery.data?.data ?? null}
+          isLoading={resultDetailsQuery.isLoading}
+          error={
+            resultDetailsQuery.isError
+              ? resultDetailsQuery.error instanceof Error
+                ? resultDetailsQuery.error.message
+                : "Failed to load result details."
+              : resultDetailsQuery.data?.isValid === false
+                ? (resultDetailsQuery.data.errors[0] ??
+                  "Failed to load result details.")
+                : null
+          }
+          onClose={handleCloseDetails}
+        />
+      ) : null}
     </div>
   );
 }

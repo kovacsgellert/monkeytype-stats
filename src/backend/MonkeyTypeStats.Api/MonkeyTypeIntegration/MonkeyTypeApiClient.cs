@@ -51,6 +51,41 @@ public class MonkeyTypeApiClient
         };
     }
 
+    public async Task<MonkeyTypeApiResultByIdResponse> GetResultByIdAsync(string resultId)
+    {
+        var endpoint = $"/results/id/{resultId}";
+        var response = await _httpClient.GetAsync(endpoint);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            await HandleErrorResponse(response, endpoint);
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+        var parsedResponse =
+            JsonSerializer.Deserialize<MonkeyTypeApiResponse<TestResultDetails>>(
+                content,
+                jsonOptions
+            )
+            ?? throw new InvalidOperationException(
+                "Failed to deserialize MonkeyType result by id response."
+            );
+
+        if (parsedResponse is null)
+        {
+            _logger.LogError(
+                $"Parsed MonkeyType result by id response is null. Raw content: {content}"
+            );
+            throw new InvalidOperationException("Parsed MonkeyType result by id response is null.");
+        }
+
+        return new MonkeyTypeApiResultByIdResponse
+        {
+            RawResponse = content,
+            ParsedResponse = parsedResponse,
+        };
+    }
+
     private async Task HandleErrorResponse(HttpResponseMessage response, string endpoint)
     {
         var content = string.Empty;
