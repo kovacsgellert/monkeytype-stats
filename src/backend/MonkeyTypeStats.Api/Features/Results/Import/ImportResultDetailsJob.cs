@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.EntityFrameworkCore;
 using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Results;
@@ -93,6 +94,14 @@ public class ImportResultDetailsJob
                 "Successfully imported result details for {Count} results",
                 resultsToImport.Count
             );
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == (HttpStatusCode)479)
+        {
+            _logger.LogError(
+                ex,
+                "MonkeyType API rate limit exceeded (status code 479). Stopping result details import job."
+            );
+            return;
         }
         catch (Exception ex)
         {

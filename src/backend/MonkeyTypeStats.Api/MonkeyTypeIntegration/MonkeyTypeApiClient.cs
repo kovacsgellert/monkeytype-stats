@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration.Models;
 
@@ -99,6 +100,10 @@ public class MonkeyTypeApiClient
             $"Failed to fetch MonkeyType results from {endpoint}. Status code: {response.StatusCode}. Response content: {content}"
         );
 
-        throw new InvalidOperationException($"Failed to fetch MonkeyType results from {endpoint}.");
+        throw new HttpRequestException(
+            $"Failed to fetch MonkeyType results from {endpoint}.",
+            null,
+            response.StatusCode
+        );
     }
 }
