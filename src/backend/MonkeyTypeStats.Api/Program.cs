@@ -5,6 +5,7 @@ using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Results.Get;
 using MonkeyTypeStats.Api.Features.Results.GetById;
 using MonkeyTypeStats.Api.Features.Results.Import;
+using MonkeyTypeStats.Api.Features.Settings.CreateBackup;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
 using Scalar.AspNetCore;
 
@@ -103,5 +104,20 @@ app.MapGet(
         }
     )
     .WithName("GetResultById");
+
+app.MapPost(
+        "/api/backup",
+        async (IMediator mediator) =>
+        {
+            var result = await mediator.Send(new CreateBackupCommand());
+            if (!result.IsValid || result.Data is null)
+            {
+                return result.ToResult();
+            }
+
+            return Results.File(result.Data.Content, "application/json", result.Data.FileName);
+        }
+    )
+    .WithName("CreateBackup");
 
 app.Run();
