@@ -13,6 +13,8 @@
 - implement backup/restore functionality ⏳
   - backup should be a huge JSON that contains both results and result details, maybe zipped for convenience
   - restore should accept an exported JSON and correctly populate the database
+- add a Tools/Settings page to expose backup/restore and maybe other settings?
+  - settings endpoints should use some kind of auth
 
 ## DevOps
 
