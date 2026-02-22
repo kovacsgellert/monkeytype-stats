@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import packageJson from "./package.json";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -13,6 +14,9 @@ export default defineConfig(({ mode }) => {
     env.MONKEYTYPE_STATS_API_HTTP;
 
   return {
+    define: {
+      __APP_VERSION__: JSON.stringify(packageJson.version),
+    },
     plugins: [react(), tailwindcss()],
     server: {
       port: Number(process.env.MONKEYTYPE_STATS_FRONTEND_PORT) || 3000,

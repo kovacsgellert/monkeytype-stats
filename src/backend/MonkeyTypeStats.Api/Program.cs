@@ -5,8 +5,10 @@ using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Results.Get;
 using MonkeyTypeStats.Api.Features.Results.GetById;
 using MonkeyTypeStats.Api.Features.Results.Import;
+using MonkeyTypeStats.Api.Features.Settings.AppVersion;
 using MonkeyTypeStats.Api.Features.Settings.CreateBackup;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
+using MonkeyTypeStats.Api.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,6 +53,7 @@ builder.Services.AddHangfireServer();
 
 builder.Services.AddScoped<ImportResultsJob>();
 builder.Services.AddScoped<ImportResultDetailsJob>();
+builder.Services.AddSingleton<AppVersionProvider>();
 
 var app = builder.Build();
 
@@ -119,5 +122,15 @@ app.MapPost(
         }
     )
     .WithName("CreateBackup");
+
+app.MapGet(
+        "/api/version",
+        async (IMediator mediator) =>
+        {
+            var result = await mediator.Send(new GetAppVersionQuery());
+            return result.ToResult();
+        }
+    )
+    .WithName("GetAppVersion");
 
 app.Run();

@@ -4,11 +4,14 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Data;
+using MonkeyTypeStats.Api.Services;
 
 namespace MonkeyTypeStats.Api.Features.Settings.CreateBackup;
 
-public class CreateBackupCommandHandler(MonkeyTypeStatsDbContext dbContext)
-    : IRequestHandler<CreateBackupCommand, OperationResult<BackupFileResult>>
+public class CreateBackupCommandHandler(
+    MonkeyTypeStatsDbContext dbContext,
+    AppVersionProvider appVersionProvider
+) : IRequestHandler<CreateBackupCommand, OperationResult<BackupFileResult>>
 {
     private static readonly JsonSerializerOptions jsonOptions = new()
     {
@@ -22,6 +25,7 @@ public class CreateBackupCommandHandler(MonkeyTypeStatsDbContext dbContext)
     {
         var backup = new BackupSnapshot
         {
+            AppVersion = appVersionProvider.GetVersion(),
             Results = await dbContext.Results.AsNoTracking().ToListAsync(cancellationToken),
             ResultDetails = await dbContext
                 .ResultDetails.AsNoTracking()
@@ -41,6 +45,7 @@ public class CreateBackupCommandHandler(MonkeyTypeStatsDbContext dbContext)
 
     private sealed class BackupSnapshot
     {
+        public string AppVersion { get; set; } = "0.0.0";
         public List<Result> Results { get; set; } = [];
         public List<ResultDetail> ResultDetails { get; set; } = [];
         public List<MonkeyTypeApiResponseLog> MonkeyTypeApiResponseLog { get; set; } = [];
