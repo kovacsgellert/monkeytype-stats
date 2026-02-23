@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Data;
+using MonkeyTypeStats.Api.Features.Settings.Backup;
 using MonkeyTypeStats.Api.Services;
 
 namespace MonkeyTypeStats.Api.Features.Settings.CreateBackup;
@@ -41,13 +42,5 @@ public class CreateBackupCommandHandler(
         var fileName = $"monkeytype-stats-backup-{timestamp}.json";
 
         return OperationResult<BackupFileResult>.Ok(new BackupFileResult(fileName, content));
-    }
-
-    private sealed class BackupSnapshot
-    {
-        public string AppVersion { get; set; } = "0.0.0";
-        public List<Result> Results { get; set; } = [];
-        public List<ResultDetail> ResultDetails { get; set; } = [];
-        public List<MonkeyTypeApiResponseLog> MonkeyTypeApiResponseLog { get; set; } = [];
     }
 }

@@ -7,6 +7,7 @@ using MonkeyTypeStats.Api.Features.Results.GetById;
 using MonkeyTypeStats.Api.Features.Results.Import;
 using MonkeyTypeStats.Api.Features.Settings.AppVersion;
 using MonkeyTypeStats.Api.Features.Settings.CreateBackup;
+using MonkeyTypeStats.Api.Features.Settings.RestoreBackup;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
 using MonkeyTypeStats.Api.Services;
 using Scalar.AspNetCore;
@@ -122,6 +123,27 @@ app.MapPost(
         }
     )
     .WithName("CreateBackup");
+
+app.MapPost(
+        "/api/backup/restore",
+        async (IFormFile backupFile, IMediator mediator) =>
+        {
+            if (backupFile.Length == 0)
+            {
+                return Results.BadRequest(OperationResult.Error("Backup file is required."));
+            }
+
+            using var stream = backupFile.OpenReadStream();
+            using var reader = new StreamReader(stream);
+            var backupJson = await reader.ReadToEndAsync();
+
+            var result = await mediator.Send(new RestoreBackupCommand(backupJson));
+            return result.ToResult();
+        }
+    )
+    .DisableAntiforgery()
+    .Accepts<IFormFile>("multipart/form-data")
+    .WithName("RestoreBackup");
 
 app.MapGet(
         "/api/version",
