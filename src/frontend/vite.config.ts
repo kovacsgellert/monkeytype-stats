@@ -1,10 +1,14 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import packageJson from "./package.json";
+import fs from "node:fs";
+import path from "node:path";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
+  const appVersion = fs
+    .readFileSync(path.resolve(__dirname, "../../version.txt"), "utf8")
+    .trim();
 
   // Prefer Aspire-injected env, fallback to .env
   const apiUrl =
@@ -15,7 +19,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     define: {
-      __APP_VERSION__: JSON.stringify(packageJson.version),
+      __APP_VERSION__: JSON.stringify(appVersion),
     },
     plugins: [react(), tailwindcss()],
     server: {

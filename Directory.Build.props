@@ -5,6 +5,8 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <Version>0.0.1-alpha</Version>
+        <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)version.txt').Trim())</Version>
+        <ContainerImageTags>$(Version)</ContainerImageTags>
+        <NoWarn>$(NoWarn);ASPIRECOMPUTE003;ASPIREPIPELINES003</NoWarn>
     </PropertyGroup>
 </Project>

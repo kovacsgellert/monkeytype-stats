@@ -15,5 +15,14 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <UserSecretsId>c62b8717-1107-449b-97a7-b66962af0047</UserSecretsId>
+        <NoWarn>$(NoWarn);ASPIRECOMPUTE003;ASPIREPIPELINE003</NoWarn>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None
+            Include="..\..\..\version.txt"
+            Link="version.txt"
+            CopyToOutputDirectory="PreserveNewest"
+        />
+    </ItemGroup>
 </Project>

@@ -1,6 +1,9 @@
+var appVersion = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "version.txt")).Trim();
 var builder = DistributedApplication.CreateBuilder(args);
 
 builder.AddDockerComposeEnvironment("monkeytype-stats-env");
+
+builder.AddContainerRegistry("ghcr", "ghcr.io", "kovacsgellert/monkeytype-stats");
 
 var postgres = builder
     .AddPostgres("postgres")
@@ -23,6 +26,6 @@ var frontend = builder
     .WithEndpoint("http", endpoint => endpoint.Port = 3000)
     .WithEnvironment("MONKEYTYPE_STATS_FRONTEND_PORT", "3000")
     .WithExternalHttpEndpoints()
-    .WithReference(api);
-
+    .WithReference(api)
+    .WithRemoteImageTag(appVersion);
 builder.Build().Run();
