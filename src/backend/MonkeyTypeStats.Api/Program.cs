@@ -1,6 +1,5 @@
 using Hangfire;
 using MediatR;
-using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Results.Get;
 using MonkeyTypeStats.Api.Features.Results.GetById;
@@ -89,70 +88,10 @@ recurringJobManager.AddOrUpdate<ImportResultDetailsJob>(
     Cron.Hourly
 );
 
-app.MapGet(
-        "/api/results",
-        async (IMediator mediator) =>
-        {
-            var result = await mediator.Send(new GetResultsQuery());
-            return result.ToResult();
-        }
-    )
-    .WithName("GetResults");
-
-app.MapGet(
-        "/api/results/{id}",
-        async (string id, IMediator mediator) =>
-        {
-            var result = await mediator.Send(new GetResultByIdQuery(id));
-            return result.ToResult();
-        }
-    )
-    .WithName("GetResultById");
-
-app.MapPost(
-        "/api/backup",
-        async (IMediator mediator) =>
-        {
-            var result = await mediator.Send(new CreateBackupCommand());
-            if (!result.IsValid || result.Data is null)
-            {
-                return result.ToResult();
-            }
-
-            return Results.File(result.Data.Content, "application/json", result.Data.FileName);
-        }
-    )
-    .WithName("CreateBackup");
-
-app.MapPost(
-        "/api/backup/restore",
-        async (IFormFile backupFile, IMediator mediator) =>
-        {
-            if (backupFile.Length == 0)
-            {
-                return Results.BadRequest(OperationResult.Error("Backup file is required."));
-            }
-
-            using var stream = backupFile.OpenReadStream();
-            using var reader = new StreamReader(stream);
-            var backupJson = await reader.ReadToEndAsync();
-
-            var result = await mediator.Send(new RestoreBackupCommand(backupJson));
-            return result.ToResult();
-        }
-    )
-    .DisableAntiforgery()
-    .Accepts<IFormFile>("multipart/form-data")
-    .WithName("RestoreBackup");
-
-app.MapGet(
-        "/api/version",
-        async (IMediator mediator) =>
-        {
-            var result = await mediator.Send(new GetAppVersionQuery());
-            return result.ToResult();
-        }
-    )
-    .WithName("GetAppVersion");
+app.MapGetResultsEndpoint();
+app.MapGetResultByIdEndpoint();
+app.MapCreateBackupEndpoint();
+app.MapRestoreBackupEndpoint();
+app.MapGetAppVersionEndpoint();
 
 app.Run();
