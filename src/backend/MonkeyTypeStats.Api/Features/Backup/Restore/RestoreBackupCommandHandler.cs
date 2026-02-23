@@ -3,9 +3,9 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Data;
-using MonkeyTypeStats.Api.Features.Settings.Backup;
+using MonkeyTypeStats.Api.Features.Backup.Common;
 
-namespace MonkeyTypeStats.Api.Features.Settings.RestoreBackup;
+namespace MonkeyTypeStats.Api.Features.Backup.Restore;
 
 public class RestoreBackupCommandHandler(MonkeyTypeStatsDbContext dbContext)
     : IRequestHandler<RestoreBackupCommand, OperationResult<RestoreBackupResult>>

@@ -2,7 +2,7 @@ using MediatR;
 using MonkeyTypeStats.Api.Common;
 using HttpResults = Microsoft.AspNetCore.Http.Results;
 
-namespace MonkeyTypeStats.Api.Features.Settings.CreateBackup;
+namespace MonkeyTypeStats.Api.Features.Backup.Create;
 
 public static class CreateBackupEndpoint
 {

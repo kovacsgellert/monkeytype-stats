@@ -4,10 +4,10 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Data;
-using MonkeyTypeStats.Api.Features.Settings.Backup;
+using MonkeyTypeStats.Api.Features.Backup.Common;
 using MonkeyTypeStats.Api.Services;
 
-namespace MonkeyTypeStats.Api.Features.Settings.CreateBackup;
+namespace MonkeyTypeStats.Api.Features.Backup.Create;
 
 public class CreateBackupCommandHandler(
     MonkeyTypeStatsDbContext dbContext,

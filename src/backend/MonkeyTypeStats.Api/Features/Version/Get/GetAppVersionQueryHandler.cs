@@ -2,7 +2,7 @@ using MediatR;
 using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Services;
 
-namespace MonkeyTypeStats.Api.Features.Settings.AppVersion;
+namespace MonkeyTypeStats.Api.Features.Version.Get;
 
 public class GetAppVersionQueryHandler(AppVersionProvider appVersionProvider)
     : IRequestHandler<GetAppVersionQuery, OperationResult<AppVersionDto>>

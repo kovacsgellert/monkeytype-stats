@@ -1,4 +1,4 @@
-namespace MonkeyTypeStats.Api.Features.Settings.RestoreBackup;
+namespace MonkeyTypeStats.Api.Features.Backup.Restore;
 
 public record RestoreBackupResult(
     int ResultsAdded,

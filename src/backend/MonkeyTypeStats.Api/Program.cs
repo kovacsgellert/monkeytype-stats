@@ -1,12 +1,12 @@
 using Hangfire;
 using MediatR;
 using MonkeyTypeStats.Api.Data;
+using MonkeyTypeStats.Api.Features.Backup.Create;
+using MonkeyTypeStats.Api.Features.Backup.Restore;
 using MonkeyTypeStats.Api.Features.Results.Get;
 using MonkeyTypeStats.Api.Features.Results.GetById;
 using MonkeyTypeStats.Api.Features.Results.Import;
-using MonkeyTypeStats.Api.Features.Settings.AppVersion;
-using MonkeyTypeStats.Api.Features.Settings.CreateBackup;
-using MonkeyTypeStats.Api.Features.Settings.RestoreBackup;
+using MonkeyTypeStats.Api.Features.Version.Get;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
 using MonkeyTypeStats.Api.Services;
 using Scalar.AspNetCore;
@@ -74,7 +74,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Register the recurring job to run daily at midnight UTC
 var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
 recurringJobManager.AddOrUpdate<ImportResultsJob>(
     "import-monkeytype-results",
