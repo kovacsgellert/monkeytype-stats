@@ -8,7 +8,8 @@ builder.AddContainerRegistry("ghcr", "ghcr.io", "kovacsgellert/monkeytype-stats"
 var postgres = builder
     .AddPostgres("postgres")
     .WithPgAdmin((container) => container.WithHostPort(4002))
-    .WithDataVolume("monkeytype-stats-data");
+    .WithDataVolume("monkeytype-stats-data")
+    .WithLifetime(ContainerLifetime.Persistent);
 
 var db = postgres.AddDatabase("monkeytype-stats-db");
 
