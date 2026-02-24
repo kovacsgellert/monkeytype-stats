@@ -7,3 +7,7 @@
 ## .csproj rules
 
 - after changing .csproj files always run `csharpier format .` in the repo root
+
+## Frontend API rules
+
+- for api requests from the frontend always use Tanstack Query
