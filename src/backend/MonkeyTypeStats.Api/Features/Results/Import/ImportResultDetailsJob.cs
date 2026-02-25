@@ -8,7 +8,7 @@ namespace MonkeyTypeStats.Api.Features.Results.Import;
 
 public class ImportResultDetailsJob
 {
-    private const int MaxApiCallsPerRun = 50;
+    private const int MaxApiCallsPerRun = 20;
 
     private readonly MonkeyTypeApiClient _monkeyTypeApiClient;
     private readonly MonkeyTypeStatsDbContext _dbContext;
