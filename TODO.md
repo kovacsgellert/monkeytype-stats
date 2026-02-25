@@ -15,7 +15,7 @@
   - restore should accept an exported JSON and correctly populate the database ✅
 - add a Tools/Settings page to expose backup/restore and maybe other settings? ✅
   - settings endpoints should use some kind of auth ⏳
-  - make it possible to trigger the ImportResultsJob from the Settings page ⏳
+  - make it possible to trigger the ImportResultsJob from the Settings page ✅
 
 ## DevOps
 

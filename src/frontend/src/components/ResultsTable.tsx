@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import type { Result } from "../types/result";
-import { formatLanguage } from "../types/result";
+import { formatLanguage } from "../utils/languageUtils";
 
 interface ResultsTableProps {
   results: Result[];

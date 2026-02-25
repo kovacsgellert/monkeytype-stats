@@ -1,5 +1,4 @@
 using Hangfire;
-using MediatR;
 using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Backup.Create;
 using MonkeyTypeStats.Api.Features.Backup.Restore;
@@ -36,9 +35,10 @@ builder.Services.AddHttpClient<MonkeyTypeApiClient>(client =>
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
+builder.AddImportResultsRateLimiter();
+
 builder.AddNpgsqlDbContext<MonkeyTypeStatsDbContext>("monkeytype-stats-db");
 
-// Register services
 builder.Services.AddScoped<DbMigrator>();
 
 builder.Services.AddHangfire(config =>
@@ -57,14 +57,12 @@ builder.Services.AddSingleton<AppVersionProvider>();
 
 var app = builder.Build();
 
-// Apply database migrations on startup
 using (var scope = app.Services.CreateScope())
 {
     var dbMigrator = scope.ServiceProvider.GetRequiredService<DbMigrator>();
     await dbMigrator.MigrateAsync();
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -73,6 +71,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRateLimiter();
 
 var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
 recurringJobManager.AddOrUpdate<ImportResultsJob>(
@@ -89,6 +88,7 @@ recurringJobManager.AddOrUpdate<ImportResultDetailsJob>(
 
 app.MapGetResultsEndpoint();
 app.MapGetResultByIdEndpoint();
+app.MapImportResultsEndpoint();
 app.MapCreateBackupEndpoint();
 app.MapRestoreBackupEndpoint();
 app.MapGetAppVersionEndpoint();

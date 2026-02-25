@@ -10,7 +10,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import type { ResultDetails } from "../types/result";
-import { formatLanguage } from "../types/result";
+import { formatLanguage } from "../utils/languageUtils";
 
 ChartJS.register(
   CategoryScale,

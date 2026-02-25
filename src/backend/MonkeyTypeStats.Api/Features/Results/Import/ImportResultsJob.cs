@@ -24,6 +24,16 @@ public class ImportResultsJob
 
     public async Task ExecuteAsync()
     {
+        await ExecuteInternalAsync();
+    }
+
+    public Task<int> ExecuteWithResultAsync()
+    {
+        return ExecuteInternalAsync();
+    }
+
+    private async Task<int> ExecuteInternalAsync()
+    {
         _logger.LogInformation("Starting daily MonkeyType results import job");
 
         try
@@ -45,7 +55,7 @@ public class ImportResultsJob
             {
                 _logger.LogInformation("No results data in API response");
                 await _dbContext.SaveChangesAsync();
-                return;
+                return 0;
             }
 
             // Get existing result IDs to avoid duplicates
@@ -79,6 +89,8 @@ public class ImportResultsJob
                 newResults.Count,
                 existingResultIds.Count
             );
+
+            return newResults.Count;
         }
         catch (HttpRequestException ex) when (ex.StatusCode == (HttpStatusCode)479)
         {
@@ -86,7 +98,7 @@ public class ImportResultsJob
                 ex,
                 "MonkeyType API rate limit exceeded (status code 479). Stopping results import job."
             );
-            return;
+            return 0;
         }
         catch (Exception ex)
         {

@@ -1,9 +1,8 @@
-import type { ResultDetailsResponse, ResultsResponse } from "../types/result";
+import type { OperationResult } from "../types/operationResult";
+import type { Result, ResultDetails } from "../types/result";
 
-const API_BASE = "/api";
-
-export async function fetchResults(): Promise<ResultsResponse> {
-  const response = await fetch(`${API_BASE}/results`);
+export async function fetchResults(): Promise<OperationResult<Result[]>> {
+  const response = await fetch(`api/results`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch results: ${response.statusText}`);
@@ -14,8 +13,8 @@ export async function fetchResults(): Promise<ResultsResponse> {
 
 export async function fetchResultDetails(
   resultId: string,
-): Promise<ResultDetailsResponse> {
-  const response = await fetch(`${API_BASE}/results/${resultId}`);
+): Promise<OperationResult<ResultDetails>> {
+  const response = await fetch(`api/results/${resultId}`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch result details: ${response.statusText}`);

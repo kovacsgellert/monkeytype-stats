@@ -3,6 +3,8 @@ export type BackupDownload = {
   fileName: string;
 };
 
+import type { OperationResult } from "../types/operationResult";
+
 export type RestoreBackupResult = {
   resultsAdded: number;
   resultsSkipped: number;
@@ -10,12 +12,6 @@ export type RestoreBackupResult = {
   resultDetailsSkipped: number;
   monkeyTypeApiResponseLogAdded: number;
   monkeyTypeApiResponseLogSkipped: number;
-};
-
-type OperationResult<T> = {
-  data: T | null;
-  errors: string[];
-  isValid: boolean;
 };
 
 const API_BASE = "/api";

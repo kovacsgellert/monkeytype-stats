@@ -27,12 +27,6 @@ export interface Result {
   isPb: boolean | null;
 }
 
-export interface ResultsResponse {
-  data: Result[];
-  errors: string[];
-  isValid: boolean;
-}
-
 export interface ResultDetails {
   id: string;
   wpm: number;
@@ -70,18 +64,3 @@ export interface ResultDetails {
   name: string | null;
 }
 
-export interface ResultDetailsResponse {
-  data: ResultDetails | null;
-  errors: string[];
-  isValid: boolean;
-}
-
-/** Format a language slug for display: "english_1k" -> "English 1k" */
-export function formatLanguage(language: string): string {
-  return language
-    .split("_")
-    .map((word) =>
-      /^\d/.test(word) ? word : word.charAt(0).toUpperCase() + word.slice(1),
-    )
-    .join(" ");
-}

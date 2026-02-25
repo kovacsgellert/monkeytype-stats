@@ -1,4 +1,4 @@
-import { formatLanguage } from "../types/result";
+import { formatLanguage } from "../utils/languageUtils";
 
 interface LanguageFilterProps {
   languages: string[];

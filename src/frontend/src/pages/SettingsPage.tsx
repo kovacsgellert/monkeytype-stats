@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { createBackup, restoreBackup } from "../api/backup";
+import { importResults } from "../api/importResults";
 
 export function SettingsPage() {
   const [selectedBackupFile, setSelectedBackupFile] = useState<File | null>(
@@ -12,6 +13,7 @@ export function SettingsPage() {
   );
   const [restoreSuccess, setRestoreSuccess] = useState<string | null>(null);
   const [restoreDetails, setRestoreDetails] = useState<string | null>(null);
+  const [importMessage, setImportMessage] = useState<string | null>(null);
 
   const createBackupMutation = useMutation({
     mutationFn: createBackup,
@@ -41,6 +43,13 @@ export function SettingsPage() {
     },
   });
 
+  const importResultsMutation = useMutation({
+    mutationFn: importResults,
+    onSuccess: (data) => {
+      setImportMessage(`Import complete. Added ${data.resultsAdded} results.`);
+    },
+  });
+
   const handleCreateBackup = () => {
     createBackupMutation.reset();
     createBackupMutation.mutate();
@@ -58,6 +67,11 @@ export function SettingsPage() {
     restoreBackupMutation.mutate(selectedBackupFile);
   };
 
+  const handleImportResults = () => {
+    setImportMessage(null);
+    importResultsMutation.mutate();
+  };
+
   const restoreError =
     restoreErrorMessage ??
     (restoreBackupMutation.isError
@@ -70,12 +84,66 @@ export function SettingsPage() {
       ? createBackupMutation.error.message
       : "Failed to create backup."
     : null;
+  const importError = importResultsMutation.isError
+    ? importResultsMutation.error instanceof Error
+      ? importResultsMutation.error.message
+      : "Failed to import results."
+    : null;
 
   return (
     <div className="space-y-10">
       <div>
         <h2 className="text-2xl font-semibold text-zinc-100">Settings</h2>
       </div>
+
+      <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-8">
+        <div className="flex items-center justify-between gap-6 flex-wrap">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-cyan-400/80">
+              MonkeyType Import
+            </p>
+            <p className="text-sm text-zinc-500 mt-1 max-w-xl">
+              Trigger a manual import from the MonkeyType API. Limited to once per
+              hour.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleImportResults}
+              disabled={importResultsMutation.isPending}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-zinc-800/70 border border-zinc-700/70 text-zinc-100 font-medium hover:bg-zinc-700/70 hover:border-zinc-600 transition-all duration-200"
+            >
+              <svg
+                className={`w-4 h-4 ${
+                  importResultsMutation.isPending ? "animate-spin" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d={
+                    importResultsMutation.isPending
+                      ? "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      : "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  }
+                />
+              </svg>
+              {importResultsMutation.isPending ? "Importing..." : "Import results"}
+            </button>
+          </div>
+        </div>
+        {importError ? (
+          <p className="mt-4 text-sm text-rose-400">{importError}</p>
+        ) : null}
+        {importMessage ? (
+          <p className="mt-4 text-sm text-emerald-400">{importMessage}</p>
+        ) : null}
+      </section>
 
       <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-8">
         <div className="flex items-center justify-between gap-6 flex-wrap">
@@ -93,7 +161,7 @@ export function SettingsPage() {
               type="button"
               onClick={handleCreateBackup}
               disabled={createBackupMutation.isPending}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg shadow-cyan-500/20"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-zinc-800/70 border border-zinc-700/70 text-zinc-100 font-medium hover:bg-zinc-700/70 hover:border-zinc-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg
                 className={`w-4 h-4 ${
