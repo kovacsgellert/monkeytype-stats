@@ -4,7 +4,7 @@ namespace MonkeyTypeStats.Api.Services;
 
 public class AppVersionProvider
 {
-    private const string DefaultVersion = "0.1.0-alpha";
+    private const string DefaultVersion = "0.1.0";
 
     public string GetVersion()
     {

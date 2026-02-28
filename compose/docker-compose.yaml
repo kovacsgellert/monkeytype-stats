@@ -29,7 +29,7 @@ services:
       - "monkeytype-stats-backend"
     restart: "unless-stopped"
   monkeytype-stats-api:
-    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-api:0.1.0-alpha"
+    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-api:0.1.0"
     environment:
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "8080"
@@ -51,7 +51,7 @@ services:
       - "monkeytype-stats-backend"
     restart: "unless-stopped"
   monkeytype-stats-frontend:
-    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-frontend:0.1.0-alpha"
+    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-frontend:0.1.0"
     environment:
       NODE_ENV: "production"
       MONKEYTYPE_STATS_FRONTEND_PORT: "3000"

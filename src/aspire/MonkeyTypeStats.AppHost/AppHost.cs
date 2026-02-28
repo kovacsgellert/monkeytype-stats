@@ -23,7 +23,8 @@ var api = builder
     .WaitFor(db)
     .WithEnvironment("MonkeyTypeApi__BaseUrl", "https://api.monkeytype.com")
     .WithEnvironment("MonkeyTypeApi__ApeKey", apeKey)
-    .WithRemoteImageTag("0.1.0-alpha");
+    .WithRemoteImageTag("0.1.0")
+    .WithRemoteImageTag("latest");
 
 var frontend = builder
     .AddViteApp("monkeytype-stats-frontend", "../../frontend")
@@ -31,6 +32,7 @@ var frontend = builder
     .WithEnvironment("MONKEYTYPE_STATS_FRONTEND_PORT", "3000")
     .WithExternalHttpEndpoints()
     .WithReference(api)
-    .WithRemoteImageTag("0.1.0-alpha");
+    .WithRemoteImageTag("0.1.0")
+    .WithRemoteImageTag("latest");
 
 builder.Build().Run();
