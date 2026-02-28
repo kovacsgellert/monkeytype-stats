@@ -40,15 +40,17 @@ I'm a backend guy with mainly .NET experience, so at the time of writing, my kno
 ## Screenshots
 
 ### Dashboard
+
 ![Dashboard overview](screenshots/dashboard.png)
 
 ### Results Table
+
 ![Results table view](screenshots/results%20table.png)
 
 ### Result Details
+
 ![Result details with charts](screenshots/result%20details.png)
 
 ### Settings
+
 ![Settings page](screenshots/settings.png)
-
-
