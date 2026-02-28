@@ -2,7 +2,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Data;
-using MonkeyTypeStats.Api.Features.Results;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
 
 namespace MonkeyTypeStats.Api.Features.Results.GetById;
@@ -27,8 +26,19 @@ public class GetResultByIdQueryHandler(
             return OperationResult<ResultDetailsDto>.Ok(resultDetail);
         }
 
-        var apiResponse = await monkeyTypeApiClient.GetResultByIdAsync(request.Id);
-        var details = apiResponse.ParsedResponse.Data;
+        var response = await monkeyTypeApiClient.GetResultByIdAsync(request.Id);
+
+        var responseLog = new MonkeyTypeApiResponseLog
+        {
+            Id = Guid.NewGuid(),
+            Timestamp = DateTime.UtcNow,
+            Endpoint = $"/results/id/{request.Id}",
+            Data = response.RawResponse,
+        };
+
+        dbContext.MonkeyTypeApiResponseLog.Add(responseLog);
+
+        var details = response.ParsedResponse.Data;
         if (details is null)
         {
             return OperationResult<ResultDetailsDto>.Error(
@@ -38,22 +48,12 @@ public class GetResultByIdQueryHandler(
 
         if (!await dbContext.ResultDetails.AnyAsync(r => r.Id == details.Id, cancellationToken))
         {
-            var responseLog = new MonkeyTypeApiResponseLog
-            {
-                Id = Guid.NewGuid(),
-                Timestamp = DateTime.UtcNow,
-                Endpoint = $"/results/id/{details.Id}",
-                Data = apiResponse.RawResponse,
-            };
+            var newResultDetail = details.ToResultDetailEntity();
 
-            dbContext.MonkeyTypeApiResponseLog.Add(responseLog);
-
-            var newDetail = details.ToResultDetailEntity();
-
-            dbContext.ResultDetails.Add(newDetail);
+            dbContext.ResultDetails.Add(newResultDetail);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            return OperationResult<ResultDetailsDto>.Ok(newDetail.ToResultDetailsDto());
+            return OperationResult<ResultDetailsDto>.Ok(newResultDetail.ToResultDetailsDto());
         }
 
         return OperationResult<ResultDetailsDto>.Error(
