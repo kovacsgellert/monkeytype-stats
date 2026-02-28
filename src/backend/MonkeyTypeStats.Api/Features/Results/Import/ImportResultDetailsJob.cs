@@ -50,8 +50,16 @@ public class ImportResultDetailsJob
                 return;
             }
 
+            var responseLogs = await _dbContext
+                .MonkeyTypeApiResponseLog.Select(log => new { log.Endpoint, log.Timestamp })
+                .ToListAsync();
+
             foreach (var result in resultsToImport)
             {
+                // do not attempt to import details for results that we've already called the API for
+                if (responseLogs.Any(log => log.Endpoint == $"/results/id/{result.Id}"))
+                    continue;
+
                 var response = await _monkeyTypeApiClient.GetResultByIdAsync(result.Id);
 
                 var responseLog = new MonkeyTypeApiResponseLog
