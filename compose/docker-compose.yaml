@@ -74,5 +74,5 @@ services:
 networks:
   monkeytype-stats-backend:
     driver: "bridge"
-  traefik_frontend:
-    external: true
+  #traefik_frontend:
+  #  external: true
