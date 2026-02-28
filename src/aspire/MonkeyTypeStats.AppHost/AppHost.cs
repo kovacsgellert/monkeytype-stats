@@ -1,9 +1,11 @@
-var appVersion = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "version.txt")).Trim();
+using Microsoft.Extensions.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 builder.AddDockerComposeEnvironment("monkeytype-stats-env");
 
-builder.AddContainerRegistry("ghcr", "ghcr.io", "kovacsgellert/monkeytype-stats");
+if (builder.Environment.IsProduction())
+    builder.AddContainerRegistry("ghcr", "ghcr.io", "kovacsgellert/monkeytype-stats");
 
 var postgres = builder
     .AddPostgres("postgres")
@@ -20,7 +22,8 @@ var api = builder
     .WithReference(db)
     .WaitFor(db)
     .WithEnvironment("MonkeyTypeApi__BaseUrl", "https://api.monkeytype.com")
-    .WithEnvironment("MonkeyTypeApi__ApeKey", apeKey);
+    .WithEnvironment("MonkeyTypeApi__ApeKey", apeKey)
+    .WithRemoteImageTag("0.1.0-alpha");
 
 var frontend = builder
     .AddViteApp("monkeytype-stats-frontend", "../../frontend")
@@ -28,5 +31,6 @@ var frontend = builder
     .WithEnvironment("MONKEYTYPE_STATS_FRONTEND_PORT", "3000")
     .WithExternalHttpEndpoints()
     .WithReference(api)
-    .WithRemoteImageTag(appVersion);
+    .WithRemoteImageTag("0.1.0-alpha");
+
 builder.Build().Run();

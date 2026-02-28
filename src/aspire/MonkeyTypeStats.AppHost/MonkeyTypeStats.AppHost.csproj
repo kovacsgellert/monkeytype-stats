@@ -18,11 +18,4 @@
         <NoWarn>$(NoWarn);ASPIRECOMPUTE003;ASPIREPIPELINE003</NoWarn>
     </PropertyGroup>
 
-    <ItemGroup>
-        <None
-            Include="..\..\..\version.txt"
-            Link="version.txt"
-            CopyToOutputDirectory="PreserveNewest"
-        />
-    </ItemGroup>
 </Project>
