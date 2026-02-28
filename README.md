@@ -15,23 +15,40 @@ The main goals of this project are:
 ## Features
 
 - Scheduled job that runs once every day and imports all new results from the MonkeyType API with ApeKey authentication.
-- Filtering results by Timestamp, Mode (including Mode2).
+  - The job can also be triggered manually from the Settings page.
+- Scheduled job that runs hourly and fetches missing result details (needed for wpm/burst/error charts on the test level).
+- Filtering results by Timestamp, Mode (including Mode2), Language.
 - Summary view showing highlights of all/filtered results.
 - Table view showing the list of all/filtered results.
 - Graph view showing speed/accuracy/consistency evolution over time (including rolling averages of latest 10 and 100 results).
+- Graph view showing wpm/burst/error on the test level (accessible through the Details column of the table view).
+- JSON backup/restore of the database
 
-### Upcoming
+### Planned
 
-- JSON export/import capability.
-- Get and display details of a result (WPM graph of a single result).
 - Activity heat-map (similar to the one on MonkeyType Account page).
 - More stats calculated based on the results.
+- Settings page protected with auth
 
 ## Deployment guide
-
-TBD
 
 ## AI usage disclosure
 
 The frontend was pretty much 100% vibe-coded.
-I'm a backend guy with mainly .NET experience, so my knowledge of React and Tailwind CSS is pretty limited at the time of writing.
+I'm a backend guy with mainly .NET experience, so at the time of writing, my knowledge of React and Tailwind CSS is limited.
+
+## Screenshots
+
+### Dashboard
+![Dashboard overview](screenshots/dashboard.png)
+
+### Results Table
+![Results table view](screenshots/results%20table.png)
+
+### Result Details
+![Result details with charts](screenshots/result%20details.png)
+
+### Settings
+![Settings page](screenshots/settings.png)
+
+
