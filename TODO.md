@@ -1,6 +1,6 @@
 # Tasks
 
-## Dev
+## Features
 
 - implement page with table view ✅
 - implement graphs showing speed and accuracy change ✅
@@ -17,10 +17,14 @@
   - settings endpoints should use some kind of auth ⏳
   - make it possible to trigger the ImportResultsJob from the Settings page ✅
 
+## Tech
+
+- add OTEL logging to frontend ⏳
+
 ## DevOps
 
-- create docker compose setup to run solution locally ⏳
-- build and push containers to GHCR ⏳
+- create docker compose setup to run solution locally ✅
+- build and push containers to GHCR ✅
 - deploy to homelab ⏳
 - expose as subdomain of kovacsgellert.dev ⏳
 - add link to blog ⏳
