@@ -32,6 +32,11 @@ The main goals of this project are:
 
 ## Deployment guide
 
+1. Create and enable an ApeKey on your [MonkeyType Account settings page](https://monkeytype.com/account-settings?tab=apeKeys).
+2. Use the example [docker-compose.yaml](compose/docker-compose.yaml) and [.env.example](compose/.env.example) files to deploy the application to you homelab.
+
+Before deployment adjust the image versions in the docker-compose.yaml to use the latest images and set up the variables in the .env file.
+
 ## AI usage disclosure
 
 The frontend was pretty much 100% vibe-coded.
