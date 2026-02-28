@@ -3,6 +3,9 @@ server {
     listen  [::]:${MONKEYTYPE_STATS_FRONTEND_PORT};
     server_name  localhost;
 
+    # allow 1GB backup files
+    client_max_body_size 1024m;
+
     root /usr/share/nginx/html;
     index index.html;
 
