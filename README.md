@@ -47,6 +47,8 @@ The main goals of this project are:
 Before deployment adjust the image versions in the docker-compose.yaml to use the latest images and set up the variables in the .env file.
 The buttons on the Settings page are protected with ApiKey auth, you will be prompted to input the ApiKey that you defined as the MONKEYTYPE_STATS_API_KEY env var.
 
+Example deployment: [typing.kovacsgellert.dev](https://typing.kovacsgellert.dev)
+
 ## AI usage disclosure
 
 The frontend was pretty much 100% vibe-coded.
