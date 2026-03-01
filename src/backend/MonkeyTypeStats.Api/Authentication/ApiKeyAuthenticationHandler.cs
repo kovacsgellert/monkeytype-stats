@@ -31,20 +31,18 @@ public sealed class ApiKeyAuthenticationHandler(
 
         if (!Request.Headers.TryGetValue(AuthorizationHeaderName, out var providedApiKey))
         {
-            return Task.FromResult(
-                AuthenticateResult.Fail("Authorization header is missing.")
-            );
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
 
         var headerValue = providedApiKey.ToString();
         if (string.IsNullOrWhiteSpace(headerValue))
         {
-            return Task.FromResult(AuthenticateResult.Fail("Authorization header is empty."));
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
 
         if (!headerValue.StartsWith(SchemePrefix, StringComparison.OrdinalIgnoreCase))
         {
-            return Task.FromResult(AuthenticateResult.Fail("Authorization scheme is invalid."));
+            return Task.FromResult(AuthenticateResult.NoResult());
         }
 
         var providedValue = headerValue[SchemePrefix.Length..].Trim();
