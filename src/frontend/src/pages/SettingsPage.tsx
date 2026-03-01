@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { createBackup, restoreBackup } from "../api/backup";
 import { importResults } from "../api/importResults";
+import { useAppVersion } from "../hooks/useAppVersion";
 
 export function SettingsPage() {
   const [selectedBackupFile, setSelectedBackupFile] = useState<File | null>(
@@ -14,6 +15,7 @@ export function SettingsPage() {
   const [restoreSuccess, setRestoreSuccess] = useState<string | null>(null);
   const [restoreDetails, setRestoreDetails] = useState<string | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
+  const appVersionQuery = useAppVersion();
 
   const createBackupMutation = useMutation({
     mutationFn: createBackup,
@@ -89,6 +91,14 @@ export function SettingsPage() {
       ? importResultsMutation.error.message
       : "Failed to import results."
     : null;
+
+  const backendVersion = appVersionQuery.data?.version ?? null;
+  const backendVersionError = appVersionQuery.isError
+    ? appVersionQuery.error instanceof Error
+      ? appVersionQuery.error.message
+      : "Failed to load backend version."
+    : null;
+  const frontendVersion = __APP_VERSION__;
 
   return (
     <div className="space-y-10">
@@ -260,6 +270,40 @@ export function SettingsPage() {
                     {restoreDetails}
                   </span>
                 ) : null}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-8">
+        <div>
+          <p className="text-xs uppercase tracking-[0.3em] text-cyan-400/80">
+            Version Info
+          </p>
+          <p className="text-sm text-zinc-500 mt-1">
+            Frontend and backend build versions for this deployment.
+          </p>
+        </div>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-zinc-800/70 bg-zinc-950/40 p-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
+              Frontend
+            </p>
+            <p className="mt-2 text-lg font-semibold text-zinc-100">
+              {frontendVersion}
+            </p>
+          </div>
+          <div className="rounded-xl border border-zinc-800/70 bg-zinc-950/40 p-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
+              Backend
+            </p>
+            <p className="mt-2 text-lg font-semibold text-zinc-100">
+              {appVersionQuery.isLoading ? "Loading..." : backendVersion ?? "-"}
+            </p>
+            {backendVersionError ? (
+              <p className="mt-2 text-xs text-rose-400">
+                {backendVersionError}
               </p>
             ) : null}
           </div>
