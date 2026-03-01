@@ -14,8 +14,8 @@ services:
   postgres:
     image: "docker.io/library/postgres:17.6"
     environment:
-      PUID: ${APPUSER_PUID}  
-      PGID: ${APPUSER_PGID}  
+      PUID: ${APPUSER_PUID}
+      PGID: ${APPUSER_PGID}
       TZ: ${TIME_ZONE_VALUE}
       POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
@@ -29,7 +29,7 @@ services:
       - "monkeytype-stats-backend"
     restart: "unless-stopped"
   monkeytype-stats-api:
-    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-api:0.1.0"
+    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-api:0.2.0"
     environment:
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "8080"
@@ -52,7 +52,7 @@ services:
       - "monkeytype-stats-backend"
     restart: "unless-stopped"
   monkeytype-stats-frontend:
-    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-frontend:0.1.0"
+    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-frontend:0.2.0"
     environment:
       NODE_ENV: "production"
       MONKEYTYPE_STATS_FRONTEND_PORT: "3000"
@@ -64,7 +64,7 @@ services:
       - "${MONKEYTYPE_STATS_FRONTEND_PORT}:3000"
     networks:
       - "monkeytype-stats-backend"
-#      - "traefik_frontend"
+    #      - "traefik_frontend"
     restart: "unless-stopped"
 #    labels:
 #      - traefik.enable=true
