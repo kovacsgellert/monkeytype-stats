@@ -1,4 +1,5 @@
 import type { PageKey } from "../types/page";
+import logo from "../assets/monkeytype-stats-logo.png";
 
 type NavItem = {
   key: PageKey;
@@ -30,20 +31,12 @@ export function TopNav({ currentPage, onNavigate }: TopNavProps) {
       <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-              <svg
-                className="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
+            <div className="w-12 h-12 rounded-xl bg-zinc-900/80 border border-zinc-800/80 flex items-center justify-center shadow-lg shadow-black/30 overflow-hidden">
+              <img
+                src={logo}
+                alt="MonkeyType Stats logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight">

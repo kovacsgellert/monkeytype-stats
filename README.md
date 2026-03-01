@@ -1,3 +1,5 @@
+<img src="monkeytype-stats-logo.png" alt="MonkeyType Stats logo" width="96" />
+
 # monkeytype-stats
 
 Unofficial MonkeyType test result exporter and dashboard.

@@ -18,6 +18,7 @@
 - deploy to homelab
 - add backend and frontend version info to the Settings page
 - settings endpoints should use some kind of auth
+- fix OTEL logging on backend and postgres (nothing's showing up in the Aspire Dashboard)
 
 ## TO DO 🔨
 
@@ -27,7 +28,6 @@
 - standardize error API error response structure and frontend error handling/display
 - add an about page with links to my blog, github and linkedin (can be disabled with an env var)
 - add OTEL logging to frontend
-- fix OTEL logging on backend and postgres (nothing's showing up in the Aspire Dashboard)
 - set up Hangfire Postgres storage
 - show Hangfire job status and stats on the Settings page
 - implement a DI based way registering API endpoints (Program.cs should only contain something like app.MapApiEndpoints() which should find and add all of them)
