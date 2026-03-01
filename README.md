@@ -14,6 +14,14 @@ The main goals of this project are:
 - enable deeper analysis of my typing stats
 - learn about .NET Aspire in a fun way
 
+## Tech stack
+- .NET Aspire orchestration
+- .NET 10 WebApi
+   - Hangfire for scheduled jobs
+- React SPA with TailwindCSS
+- PostgreSQL database
+- Docker + Docker Compose
+
 ## Features
 
 - Scheduled job that runs once every day and imports all new results from the MonkeyType API with ApeKey authentication.
