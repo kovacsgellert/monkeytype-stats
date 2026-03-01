@@ -1,4 +1,6 @@
 using Hangfire;
+using Microsoft.AspNetCore.Authentication;
+using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Backup.Create;
 using MonkeyTypeStats.Api.Features.Backup.Restore;
@@ -13,6 +15,22 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
+    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
+        ApiKeyAuthenticationHandler.SchemeName,
+        _ => { }
+    );
+
+builder.Services.AddAuthorization(options =>
+    options.AddPolicy(
+        "ApiKey",
+        policy =>
+            policy
+                .RequireAuthenticatedUser()
+                .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.SchemeName)
+    )
+);
 
 var monkeyTypeApiConfig = builder.Configuration.GetSection("MonkeyTypeApi");
 
@@ -71,6 +89,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseRateLimiter();
 
 var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();

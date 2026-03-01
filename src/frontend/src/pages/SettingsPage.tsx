@@ -18,7 +18,7 @@ export function SettingsPage() {
   const appVersionQuery = useAppVersion();
 
   const createBackupMutation = useMutation({
-    mutationFn: createBackup,
+    mutationFn: (apiKey: string) => createBackup(apiKey),
     onSuccess: ({ blob, fileName }) => {
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -32,7 +32,8 @@ export function SettingsPage() {
   });
 
   const restoreBackupMutation = useMutation({
-    mutationFn: restoreBackup,
+    mutationFn: ({ backupFile, apiKey }: { backupFile: File; apiKey: string }) =>
+      restoreBackup(backupFile, apiKey),
     onSuccess: (data) => {
       setRestoreSuccess("Backup restored successfully.");
       setRestoreDetails(
@@ -46,7 +47,7 @@ export function SettingsPage() {
   });
 
   const importResultsMutation = useMutation({
-    mutationFn: importResults,
+    mutationFn: (apiKey: string) => importResults(apiKey),
     onSuccess: (data) => {
       setImportMessage(`Import complete. Added ${data.resultsAdded} results.`);
     },
@@ -54,7 +55,11 @@ export function SettingsPage() {
 
   const handleCreateBackup = () => {
     createBackupMutation.reset();
-    createBackupMutation.mutate();
+    const apiKey = window.prompt("Enter API key to create a backup:");
+    if (!apiKey) {
+      return;
+    }
+    createBackupMutation.mutate(apiKey);
   };
 
   const handleRestoreBackup = () => {
@@ -63,15 +68,24 @@ export function SettingsPage() {
       return;
     }
 
+    const apiKey = window.prompt("Enter API key to restore a backup:");
+    if (!apiKey) {
+      return;
+    }
+
     setRestoreErrorMessage(null);
     setRestoreSuccess(null);
     setRestoreDetails(null);
-    restoreBackupMutation.mutate(selectedBackupFile);
+    restoreBackupMutation.mutate({ backupFile: selectedBackupFile, apiKey });
   };
 
   const handleImportResults = () => {
     setImportMessage(null);
-    importResultsMutation.mutate();
+    const apiKey = window.prompt("Enter API key to import results:");
+    if (!apiKey) {
+      return;
+    }
+    importResultsMutation.mutate(apiKey);
   };
 
   const restoreError =

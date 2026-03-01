@@ -4,6 +4,7 @@ export type BackupDownload = {
 };
 
 import type { OperationResult } from "../types/operationResult";
+import { createApiKeyAuthHeaders } from "./apiKeyAuth";
 
 export type RestoreBackupResult = {
   resultsAdded: number;
@@ -16,8 +17,15 @@ export type RestoreBackupResult = {
 
 const API_BASE = "/api";
 
-export async function createBackup(): Promise<BackupDownload> {
-  const response = await fetch(`${API_BASE}/backup`, { method: "POST" });
+export async function createBackup(apiKey: string): Promise<BackupDownload> {
+  const response = await fetch(`${API_BASE}/backup`, {
+    method: "POST",
+    headers: createApiKeyAuthHeaders(apiKey),
+  });
+
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
 
   if (!response.ok) {
     throw new Error("Failed to create backup.");
@@ -33,14 +41,20 @@ export async function createBackup(): Promise<BackupDownload> {
 
 export async function restoreBackup(
   backupFile: File,
+  apiKey: string,
 ): Promise<RestoreBackupResult> {
   const formData = new FormData();
   formData.append("backupFile", backupFile);
 
   const response = await fetch(`${API_BASE}/backup/restore`, {
     method: "POST",
+    headers: createApiKeyAuthHeaders(apiKey),
     body: formData,
   });
+
+  if (response.status === 401) {
+    throw new Error("Unauthorized");
+  }
 
   let payload: OperationResult<RestoreBackupResult> | null = null;
 

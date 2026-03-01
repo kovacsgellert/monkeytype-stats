@@ -36,6 +36,7 @@ services:
       ConnectionStrings__monkeytype-stats-db: "Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=monkeytype-stats-db"
       MonkeyTypeApi__BaseUrl: "https://api.monkeytype.com"
       MonkeyTypeApi__ApeKey: "${MONKEYTYPE_APE_KEY}"
+      MonkeyTypeStatsApiKey: "${MONKEYTYPE_STATS_API_KEY}"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://monkeytype-stats-env-dashboard:18889"
       OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
       OTEL_SERVICE_NAME: "monkeytype-stats-api"

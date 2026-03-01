@@ -53,6 +53,7 @@ public static class ImportResultsEndpoint
                 }
             )
             .WithName("ImportResults")
+            .RequireAuthorization("ApiKey")
             .RequireRateLimiting("import-results");
 
         return app;

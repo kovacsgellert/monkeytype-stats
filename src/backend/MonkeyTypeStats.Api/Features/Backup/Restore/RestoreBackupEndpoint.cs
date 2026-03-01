@@ -29,7 +29,8 @@ public static class RestoreBackupEndpoint
             )
             .DisableAntiforgery()
             .Accepts<IFormFile>("multipart/form-data")
-            .WithName("RestoreBackup");
+            .WithName("RestoreBackup")
+            .RequireAuthorization("ApiKey");
 
         return app;
     }

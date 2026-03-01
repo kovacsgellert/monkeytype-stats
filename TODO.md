@@ -16,13 +16,15 @@
 - create docker compose setup to run solution locally
 - build and push containers to GHCR
 - deploy to homelab
+- add backend and frontend version info to the Settings page
+- settings endpoints should use some kind of auth
 
 ## TO DO 🔨
 
 - implement heat-map similar to MonkeyType original
-- settings endpoints should use some kind of auth
 - come up with a better way of versioning the containers
 - create and add icon to the frontend
+- standardize error API error response structure and frontend error handling/display
 - add an about page with links to my blog, github and linkedin (can be disabled with an env var)
 - add OTEL logging to frontend
 - fix OTEL logging on backend and postgres (nothing's showing up in the Aspire Dashboard)

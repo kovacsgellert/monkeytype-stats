@@ -16,6 +16,7 @@ var postgres = builder
 var db = postgres.AddDatabase("monkeytype-stats-db");
 
 var apeKey = builder.AddParameter("monkeytype-ape-key", secret: true);
+var apiKey = builder.AddParameter("monkeytype-stats-api-key", secret: true);
 
 var api = builder
     .AddProject<Projects.MonkeyTypeStats_Api>("monkeytype-stats-api")
@@ -23,6 +24,7 @@ var api = builder
     .WaitFor(db)
     .WithEnvironment("MonkeyTypeApi__BaseUrl", "https://api.monkeytype.com")
     .WithEnvironment("MonkeyTypeApi__ApeKey", apeKey)
+    .WithEnvironment("MonkeyTypeStatsApiKey", apiKey)
     .WithRemoteImageTag("0.1.0")
     .WithRemoteImageTag("latest");
 

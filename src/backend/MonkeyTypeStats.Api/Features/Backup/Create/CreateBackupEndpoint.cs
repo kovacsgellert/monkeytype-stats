@@ -25,7 +25,8 @@ public static class CreateBackupEndpoint
                     );
                 }
             )
-            .WithName("CreateBackup");
+            .WithName("CreateBackup")
+            .RequireAuthorization("ApiKey");
 
         return app;
     }
