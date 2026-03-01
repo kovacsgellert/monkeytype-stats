@@ -1,5 +1,6 @@
 <Project>
     <PropertyGroup>
+        <Verion>0.1.0</Verion>
         <Nullable>enable</Nullable>
         <TargetFramework>net10.0</TargetFramework>
         <LangVersion>latest</LangVersion>
