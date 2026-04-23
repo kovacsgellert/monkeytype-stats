@@ -48,8 +48,6 @@ public class ImportResultsJob
                 Data = response.RawResponse,
             };
 
-            _dbContext.MonkeyTypeApiResponseLog.Add(responseLog);
-
             var resultsData = response.ParsedResponse.Data;
             if (resultsData is null || resultsData.Count == 0)
             {
@@ -71,16 +69,16 @@ public class ImportResultsJob
                 .Select(r => r.ToResultEntity())
                 .ToList();
 
-            if (newResults.Count > 0)
-            {
-                _dbContext.Results.AddRange(newResults);
-                _logger.LogInformation("Adding {Count} new results to database", newResults.Count);
-            }
-            else
+            if (newResults.Count == 0)
             {
                 _logger.LogInformation("No new results to import");
+                return 0;
             }
 
+            _logger.LogInformation("Adding {Count} new results to database", newResults.Count);
+
+            _dbContext.MonkeyTypeApiResponseLog.Add(responseLog);
+            _dbContext.Results.AddRange(newResults);
             await _dbContext.SaveChangesAsync();
 
             _logger.LogInformation(
