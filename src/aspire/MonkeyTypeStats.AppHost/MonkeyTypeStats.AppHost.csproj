@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.2.3">
+<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
     <ItemGroup>
         <ProjectReference Include="..\..\backend\MonkeyTypeStats.Api\MonkeyTypeStats.Api.csproj" />
     </ItemGroup>
@@ -7,6 +7,8 @@
         <PackageReference Include="Aspire.Hosting.Docker" />
         <PackageReference Include="Aspire.Hosting.JavaScript" />
         <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
     </ItemGroup>
 
     <PropertyGroup>
