@@ -20,18 +20,21 @@
 - settings endpoints should use some kind of auth
 - fix OTEL logging on backend and postgres (nothing's showing up in the Aspire Dashboard)
 - create and add icon to the frontend
+- expose as subdomain of [kovacsgellert.dev](https://kovacsgellert.dev)
+  - [typing.kovacsgellert.dev](https://typing.kovacsgellert.dev)
+- add link on my blog pointing to monkeytype-stats
 
 ## TO DO 🔨
 
-- implement heat-map similar to MonkeyType original
-- come up with a better way of versioning the containers
-- standardize error API error response structure and frontend error handling/display
-- add an about page with links to my blog, github and linkedin (can be disabled with an env var)
-- add OTEL logging to frontend
-- set up Hangfire Postgres storage
-- show Hangfire job status and stats on the Settings page
-- implement a DI based way registering API endpoints (Program.cs should only contain something like app.MapApiEndpoints() which should find and add all of them)
-- general code cleanup
-- make the frontend mobile friendly
-- expose as subdomain of [kovacsgellert.dev](https://kovacsgellert.dev)
-- add link on my blog pointing to monkeytype-stats
+- chore: update screenshots in README
+- chore: update postgres and other container versions to latest in the docker-compose file
+- feat: implement heat-map similar to MonkeyType original
+- feat: come up with a better way of versioning the container images (one source of truth, reused)
+- feat: standardize error API error response structure and frontend error handling/display
+- feat: add an about page with links to my blog, github and linkedin (can be disabled with an env var)
+- feat: add OTEL logging to frontend
+- feat: set up Hangfire Postgres storage
+- feat: show Hangfire job status and stats on the Settings page
+- feat: implement a DI based way registering API endpoints (Program.cs should only contain something like app.MapApiEndpoints() which should find and add all of them)
+- chore: general code cleanup
+- feat: make the frontend mobile friendly
