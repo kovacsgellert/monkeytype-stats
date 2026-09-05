@@ -27,6 +27,7 @@ The main goals of this project are:
 - Scheduled job that runs once every day and imports all new results from the MonkeyType API with ApeKey authentication.
   - The job can also be triggered manually from the Settings page (endpoint protected with ApiKey auth).
 - Scheduled job that runs hourly and fetches missing result details (needed for wpm/burst/error charts on the test level).
+- Activity heatmap (similar to the one on MonkeyType Account page).
 - Filtering results by Timestamp, Mode (including Mode2), Language.
 - Summary view showing highlights of all/filtered results.
 - Table view showing the list of all/filtered results.
@@ -36,7 +37,6 @@ The main goals of this project are:
 
 ### Planned
 
-- Activity heat-map (similar to the one on MonkeyType Account page).
 - More stats calculated based on the results.
 
 ## Deployment guide
@@ -55,6 +55,10 @@ The frontend was pretty much 100% vibe-coded.
 I'm a backend guy with mainly .NET experience, so at the time of writing, my knowledge of React and Tailwind CSS is limited.
 
 ## Screenshots
+
+### Heatmap
+
+![Heatmap](screenshots/heatmap.png)
 
 ### Dashboard
 

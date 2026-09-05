@@ -24,10 +24,10 @@
   - [typing.kovacsgellert.dev](https://typing.kovacsgellert.dev)
 - add link on my blog pointing to monkeytype-stats
 - implement heatmap similar to MonkeyType original
+- chore: update screenshots in README
 
 ## TO DO 🔨
 
-- chore: update screenshots in README
 - chore: update postgres and other container versions to latest in the docker-compose file
 - feat: come up with a better way of versioning the container images (one source of truth, reused)
 - feat: standardize error API error response structure and frontend error handling/display
