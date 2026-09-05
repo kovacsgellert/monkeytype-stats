@@ -7,6 +7,7 @@ import { ModeFilter } from "../components/ModeFilter";
 import { LanguageFilter } from "../components/LanguageFilter";
 import { PeriodFilter } from "../components/PeriodFilter";
 import { ResultsChart } from "../components/ResultsChart";
+import { ActivityHeatmap } from "../components/ActivityHeatmap";
 import { ResultDetailsModal } from "../components/ResultDetailsModal";
 import type { Result } from "../types/result";
 import { useResultDetails } from "../hooks/useResultDetails";
@@ -181,6 +182,11 @@ export function DashboardPage() {
         </div>
       ) : resultsData.length ? (
         <>
+          <ActivityHeatmap results={resultsData} />
+          <div
+            aria-hidden="true"
+            className="border-t border-zinc-800/50 mb-8"
+          />
           <PeriodFilter
             years={years}
             selectedPeriod={selectedPeriod}

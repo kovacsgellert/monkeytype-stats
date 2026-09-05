@@ -23,12 +23,12 @@
 - expose as subdomain of [kovacsgellert.dev](https://kovacsgellert.dev)
   - [typing.kovacsgellert.dev](https://typing.kovacsgellert.dev)
 - add link on my blog pointing to monkeytype-stats
+- implement heatmap similar to MonkeyType original
 
 ## TO DO 🔨
 
 - chore: update screenshots in README
 - chore: update postgres and other container versions to latest in the docker-compose file
-- feat: implement heat-map similar to MonkeyType original
 - feat: come up with a better way of versioning the container images (one source of truth, reused)
 - feat: standardize error API error response structure and frontend error handling/display
 - feat: add an about page with links to my blog, github and linkedin (can be disabled with an env var)
