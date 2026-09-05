@@ -423,3 +423,6 @@ FodyWeavers.xsd
 
 # ignore downlodaed results
 results/
+
+# .NET local tools restore stamp (see Directory.Build.targets)
+.config/.dotnet-tools.restored

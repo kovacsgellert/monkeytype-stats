@@ -1,0 +1,21 @@
+<Project>
+    <!--
+        Automatically restore .NET local tools (see .config/dotnet-tools.json, e.g. csharpier)
+        so `dotnet <tool>` works on fresh clones without a manual `dotnet tool restore`.
+        Incremental: only runs when the manifest is newer than the stamp file.
+        Failures are ignored so offline builds keep working (restore is retried next build).
+    -->
+    <Target Name="RestoreDotnetLocalTools"
+            BeforeTargets="BeforeBuild"
+            Inputs="$(MSBuildThisFileDirectory).config/dotnet-tools.json"
+            Outputs="$(MSBuildThisFileDirectory).config/.dotnet-tools.restored">
+        <Exec Command="dotnet tool restore"
+              WorkingDirectory="$(MSBuildThisFileDirectory)"
+              IgnoreExitCode="true">
+            <Output TaskParameter="ExitCode" PropertyName="DotnetToolRestoreExitCode" />
+        </Exec>
+        <Touch Condition="'$(DotnetToolRestoreExitCode)' == '0'"
+               Files="$(MSBuildThisFileDirectory).config/.dotnet-tools.restored"
+               AlwaysCreate="true" />
+    </Target>
+</Project>
