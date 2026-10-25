@@ -15,15 +15,17 @@ interface StatCardProps {
 function StatCard({ label, value, subValue, color, delay }: StatCardProps) {
   return (
     <div
-      className="group relative overflow-hidden rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-6 backdrop-blur-sm transition-all duration-300 hover:border-zinc-700/50 hover:bg-zinc-800/30"
+      className="group relative overflow-hidden rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-4 backdrop-blur-sm transition-all duration-300 hover:border-zinc-700/50 hover:bg-zinc-800/30 sm:p-6"
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-zinc-800/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <div className="relative">
-        <div className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-2">
+        <div className="text-[11px] sm:text-xs font-medium uppercase tracking-wider text-zinc-500 mb-2">
           {label}
         </div>
-        <div className={`text-3xl font-bold font-mono ${color}`}>{value}</div>
+        <div className={`text-2xl sm:text-3xl font-bold font-mono ${color}`}>
+          {value}
+        </div>
         {subValue && (
           <div className="text-sm text-zinc-500 mt-1">{subValue}</div>
         )}
@@ -57,7 +59,7 @@ export function StatsSummary({ results }: StatsSummaryProps) {
       : 0;
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
       <StatCard
         label="Best WPM"
         value={Math.round(bestWpm)}

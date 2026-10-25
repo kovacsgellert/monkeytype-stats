@@ -115,13 +115,13 @@ export function SettingsPage() {
   const frontendVersion = __APP_VERSION__;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 sm:space-y-10">
       <div>
         <h2 className="text-2xl font-semibold text-zinc-100">Settings</h2>
       </div>
 
-      <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-8">
-        <div className="flex items-center justify-between gap-6 flex-wrap">
+      <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-4 sm:p-6 lg:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-cyan-400/80">
               MonkeyType Import
@@ -131,12 +131,12 @@ export function SettingsPage() {
               hour.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center gap-3 sm:w-auto">
             <button
               type="button"
               onClick={handleImportResults}
               disabled={importResultsMutation.isPending}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-zinc-800/70 border border-zinc-700/70 text-zinc-100 font-medium hover:bg-zinc-700/70 hover:border-zinc-600 transition-all duration-200"
+              className="inline-flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl bg-zinc-800/70 border border-zinc-700/70 text-zinc-100 font-medium hover:bg-zinc-700/70 hover:border-zinc-600 transition-all duration-200 sm:w-auto"
             >
               <svg
                 className={`w-4 h-4 ${
@@ -169,8 +169,8 @@ export function SettingsPage() {
         ) : null}
       </section>
 
-      <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-8">
-        <div className="flex items-center justify-between gap-6 flex-wrap">
+      <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-4 sm:p-6 lg:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-cyan-400/80">
               Backup & Restore
@@ -180,12 +180,12 @@ export function SettingsPage() {
               this when redeploying the application.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center gap-3 sm:w-auto">
             <button
               type="button"
               onClick={handleCreateBackup}
               disabled={createBackupMutation.isPending}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-zinc-800/70 border border-zinc-700/70 text-zinc-100 font-medium hover:bg-zinc-700/70 hover:border-zinc-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl bg-zinc-800/70 border border-zinc-700/70 text-zinc-100 font-medium hover:bg-zinc-700/70 hover:border-zinc-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
             >
               <svg
                 className={`w-4 h-4 ${
@@ -215,7 +215,7 @@ export function SettingsPage() {
         ) : null}
 
         <div className="mt-8">
-          <div className="rounded-2xl border border-dashed border-zinc-700/80 bg-zinc-950/40 p-6">
+          <div className="rounded-2xl border border-dashed border-zinc-700/80 bg-zinc-950/40 p-4 sm:p-6">
             <p className="text-sm font-semibold text-zinc-200">
               Restore backup
             </p>
@@ -248,7 +248,7 @@ export function SettingsPage() {
               type="button"
               onClick={handleRestoreBackup}
               disabled={restoreBackupMutation.isPending || !selectedBackupFile}
-              className="mt-4 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-zinc-800/60 border border-zinc-700/70 text-sm font-medium text-zinc-200 hover:bg-zinc-700/60 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 px-5 py-3 rounded-xl bg-zinc-800/60 border border-zinc-700/70 text-sm font-medium text-zinc-200 hover:bg-zinc-700/60 transition disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
             >
               <svg
                 className={`w-4 h-4 ${
@@ -290,7 +290,7 @@ export function SettingsPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-8">
+      <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-4 sm:p-6 lg:p-8">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-cyan-400/80">
             Version Info

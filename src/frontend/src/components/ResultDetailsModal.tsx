@@ -61,10 +61,10 @@ export function ResultDetailsModal({
     : "";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-3xl mx-4 rounded-3xl border border-zinc-800/80 bg-zinc-950/90 shadow-2xl shadow-black/40">
-        <div className="flex items-center justify-between border-b border-zinc-800/70 px-6 py-4">
-          <div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border border-zinc-800/80 bg-zinc-950/90 shadow-2xl shadow-black/40 sm:rounded-3xl">
+        <div className="flex items-center justify-between gap-3 border-b border-zinc-800/70 px-4 py-4 sm:px-6">
+          <div className="min-w-0">
             <p className="text-xs uppercase tracking-[0.2em] text-cyan-400/80">
               Result Details
             </p>
@@ -76,7 +76,7 @@ export function ResultDetailsModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-full border border-zinc-700/60 bg-zinc-900/60 p-2 text-zinc-400 transition hover:bg-zinc-800/70 hover:text-zinc-200"
+            className="shrink-0 rounded-full border border-zinc-700/60 bg-zinc-900/60 p-2 text-zinc-400 transition hover:bg-zinc-800/70 hover:text-zinc-200"
             aria-label="Close details"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -90,9 +90,9 @@ export function ResultDetailsModal({
           </button>
         </div>
 
-        <div className="px-6 py-6">
+        <div className="px-4 py-5 sm:px-6 sm:py-6">
           {details ? (
-            <div className="mb-6 grid grid-cols-2 gap-3 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-4 text-sm">
+            <div className="mb-6 grid grid-cols-1 gap-3 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-4 text-sm sm:grid-cols-2">
               <div className="flex items-center justify-between">
                 <span className="text-zinc-500">WPM</span>
                 <span className="text-zinc-100 font-semibold">
@@ -142,7 +142,7 @@ export function ResultDetailsModal({
               No chart data available for this result.
             </div>
           ) : (
-            <div className="h-72 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-4">
+            <div className="h-56 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-3 sm:h-72 sm:p-4">
               <Line
                 data={{
                   labels,
