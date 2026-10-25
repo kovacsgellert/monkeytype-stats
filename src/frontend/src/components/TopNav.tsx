@@ -1,31 +1,22 @@
-import type { PageKey } from "../types/page";
+import { Link } from "@tanstack/react-router";
 import logo from "../assets/monkeytype-stats-logo.png";
 
 type NavItem = {
-  key: PageKey;
+  to: "/" | "/explorer" | "/goals" | "/settings";
   label: string;
-  description: string;
 };
 
 const navItems: NavItem[] = [
-  {
-    key: "dashboard",
-    label: "Dashboard",
-    description: "Performance overview",
-  },
-  {
-    key: "settings",
-    label: "Settings",
-    description: "Backups & preferences",
-  },
+  { to: "/", label: "Dashboard" },
+  { to: "/explorer", label: "Explorer" },
+  { to: "/goals", label: "Goals" },
+  { to: "/settings", label: "Settings" },
 ];
 
-type TopNavProps = {
-  currentPage: PageKey;
-  onNavigate: (page: PageKey) => void;
-};
+const navLinkBase =
+  "group relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200";
 
-export function TopNav({ currentPage, onNavigate }: TopNavProps) {
+export function TopNav() {
   return (
     <header className="border-b border-zinc-800/50 backdrop-blur-sm bg-zinc-950/80 sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3 sm:px-6 sm:py-5 sm:gap-6">
@@ -49,23 +40,21 @@ export function TopNav({ currentPage, onNavigate }: TopNavProps) {
           </div>
         </div>
         <nav className="flex items-center gap-1 sm:gap-2 rounded-full bg-zinc-900/60 border border-zinc-800/80 p-1 shrink-0">
-          {navItems.map((item) => {
-            const isActive = item.key === currentPage;
-            return (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => onNavigate(item.key)}
-                className={`group relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                  isActive
-                    ? "bg-linear-to-r from-cyan-500/20 to-blue-500/20 text-white shadow-inner shadow-cyan-500/10"
-                    : "text-zinc-400 hover:text-zinc-100"
-                }`}
-              >
-                <span className="relative z-10">{item.label}</span>
-              </button>
-            );
-          })}
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              activeOptions={{ exact: item.to === "/", includeSearch: false }}
+              className={navLinkBase}
+              activeProps={{
+                className:
+                  "bg-linear-to-r from-cyan-500/20 to-blue-500/20 text-white shadow-inner shadow-cyan-500/10",
+              }}
+              inactiveProps={{ className: "text-zinc-400 hover:text-zinc-100" }}
+            >
+              <span className="relative z-10">{item.label}</span>
+            </Link>
+          ))}
         </nav>
       </div>
     </header>
