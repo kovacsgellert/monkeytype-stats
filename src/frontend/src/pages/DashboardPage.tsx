@@ -1,236 +1,152 @@
-import { useState, useMemo, useCallback } from "react";
-import { useResults } from "../hooks/useResults";
-import { ResultsTable } from "../components/ResultsTable";
-import { StatsSummary } from "../components/StatsSummary";
-import { LoadingSkeleton } from "../components/LoadingSkeleton";
-import { ModeFilter } from "../components/ModeFilter";
-import { LanguageFilter } from "../components/LanguageFilter";
-import { PeriodFilter } from "../components/PeriodFilter";
-import { ResultsChart } from "../components/ResultsChart";
+import { Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { ActivityHeatmap } from "../components/ActivityHeatmap";
-import { ResultDetailsModal } from "../components/ResultDetailsModal";
-import type { Result } from "../types/result";
-import { useResultDetails } from "../hooks/useResultDetails";
+import { CommunityStanding } from "../components/dashboard/CommunityStanding";
+import { GoalsSummary } from "../components/dashboard/GoalsSummary";
+import { InsightCard } from "../components/dashboard/InsightCard";
+import { PersonalBests } from "../components/dashboard/PersonalBests";
+import { TrackCards } from "../components/dashboard/TrackCards";
+import { LoadingSkeleton } from "../components/LoadingSkeleton";
+import { buttonClass, EmptyState, StatTile } from "../components/ui";
+import { formatDate, formatNumber, formatRelativeDays, signed } from "../utils/format";
+import { useGoalProgress } from "../hooks/useGoalProgress";
+import { useProfile } from "../hooks/useProfile";
+import { max, mean, recentVsPrevious, totalHours } from "../stats/aggregate";
+import { breakRecovery, computeInsights } from "../stats/insights";
+import { isPerformance } from "../stats/normalize";
+
+const WELCOME_BACK_DAYS = 14;
+const MAX_INSIGHT_CARDS = 6;
 
 export function DashboardPage() {
-  const resultsQuery = useResults();
-  const resultsData = useMemo(
-    () => resultsQuery.data?.data ?? [],
-    [resultsQuery.data?.data],
-  );
-  const [selectedMode, setSelectedMode] = useState<string | null>(null);
-  const [selectedMode2, setSelectedMode2] = useState<string | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
-  const [selectedResult, setSelectedResult] = useState<Result | null>(null);
-  const selectedResultId = selectedResult?.id ?? null;
-  const resultDetailsQuery = useResultDetails(selectedResultId);
+  const { resultsQuery, results, tracks, goals } = useGoalProgress();
+  const profileQuery = useProfile();
+  const profile = profileQuery.data;
 
-  // Unique years derived from the data, sorted descending
-  const years = useMemo(() => {
-    const unique = [
-      ...new Set(resultsData.map((r) => new Date(r.timestamp).getFullYear())),
-    ];
-    return unique.sort((a, b) => b - a);
-  }, [resultsData]);
+  const insights = useMemo(() => computeInsights({ results, tracks }), [results, tracks]);
 
-  // Unique top-level modes (e.g. "time", "words", "quote")
-  const modes = useMemo(() => {
-    return [...new Set(resultsData.map((r) => r.mode))].sort();
-  }, [resultsData]);
+  const vitals = useMemo(() => {
+    const perf = results.filter(isPerformance);
+    const wpms = perf.map((r) => r.wpm);
+    const { recent, previous } = recentVsPrevious(wpms, 20);
+    const officialBest = profile?.personalBests.reduce<(typeof profile.personalBests)[number] | null>(
+      (best, pb) => (!best || pb.wpm > best.wpm ? pb : best),
+      null,
+    );
+    return {
+      recent,
+      previous,
+      best: officialBest?.wpm ?? max(wpms),
+      bestLabel: officialBest ? `${officialBest.mode} ${officialBest.mode2} · ${formatDate(officialBest.timestamp)}` : "best imported test",
+      acc: mean(perf.map((r) => r.acc)),
+      cons: mean(perf.map((r) => r.consistency)),
+      importedHours: totalHours(results),
+    };
+  }, [results, profile]);
 
-  // Mode2 options for the currently selected mode
-  const mode2Options = useMemo(() => {
-    if (selectedMode === null) return [];
-    // Quote mode has no meaningful mode2 distinction
-    if (selectedMode === "quote") return [];
-    const options = [
-      ...new Set(
-        resultsData.filter((r) => r.mode === selectedMode).map((r) => r.mode2),
-      ),
-    ];
-    return options.sort((a, b) => {
-      const numA = Number(a);
-      const numB = Number(b);
-      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-      return a.localeCompare(b);
-    });
-  }, [resultsData, selectedMode]);
+  if (resultsQuery.isLoading) return <LoadingSkeleton />;
+  if (resultsQuery.isError)
+    return (
+      <EmptyState title="Failed to load results">
+        <p>{resultsQuery.error instanceof Error ? resultsQuery.error.message : "An unexpected error occurred"}</p>
+        <button type="button" onClick={() => resultsQuery.refetch()} className={`${buttonClass} mt-4`}>
+          Try again
+        </button>
+      </EmptyState>
+    );
+  if (results.length === 0)
+    return (
+      <EmptyState title="No results yet">
+        Import your Monkeytype results from{" "}
+        <Link to="/settings" className="text-cyan-400 hover:text-cyan-300">
+          Settings
+        </Link>{" "}
+        to see your insights.
+      </EmptyState>
+    );
 
-  // When mode changes, reset mode2
-  const handleModeChange = useCallback((mode: string | null) => {
-    setSelectedMode(mode);
-    setSelectedMode2(null);
-  }, []);
-
-  // Unique languages derived from the data (null/missing treated as "english")
-  const languages = useMemo(() => {
-    const unique = [
-      ...new Set(resultsData.map((r) => r.language ?? "english")),
-    ];
-    return unique.sort();
-  }, [resultsData]);
-
-  const filteredResults = useMemo(() => {
-    let results = resultsData;
-    if (selectedPeriod === "last-month") {
-      const now = new Date();
-      const cutoff = new Date(
-        now.getFullYear(),
-        now.getMonth() - 1,
-        now.getDate(),
-      );
-      results = results.filter((r) => new Date(r.timestamp) >= cutoff);
-    } else if (selectedPeriod !== null) {
-      const year = Number(selectedPeriod);
-      results = results.filter(
-        (r) => new Date(r.timestamp).getFullYear() === year,
-      );
-    }
-    if (selectedMode !== null) {
-      results = results.filter((r) => r.mode === selectedMode);
-    }
-    if (selectedMode2 !== null) {
-      results = results.filter((r) => r.mode2 === selectedMode2);
-    }
-    if (selectedLanguage !== null) {
-      results = results.filter(
-        (r) => (r.language ?? "english") === selectedLanguage,
-      );
-    }
-    return results;
-  }, [
-    resultsData,
-    selectedPeriod,
-    selectedMode,
-    selectedMode2,
-    selectedLanguage,
-  ]);
-
-  const handleResultSelect = useCallback((result: Result) => {
-    setSelectedResult(result);
-  }, []);
-
-  const handleCloseDetails = useCallback(() => {
-    setSelectedResult(null);
-  }, []);
+  const lastTest = results[results.length - 1];
+  const daysSinceLast = (Date.now() - lastTest.date.getTime()) / 86_400_000;
+  const mainTrack = tracks[0];
+  const recovery = breakRecovery(tracks);
+  const [hero, ...rest] = insights;
+  const lifetimeHours = profile?.profile ? profile.profile.timeTypingSeconds / 3600 : null;
 
   return (
-    <>
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 sm:mb-8">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-zinc-100">Dashboard</h2>
-          <p className="text-sm text-zinc-500">
-            Explore your recent results and trends.
+          <p className="text-sm text-zinc-400">
+            Last test {formatDate(lastTest.date)} · {formatNumber(results.length)} results imported
           </p>
+          <h2 className="mt-1 text-2xl font-semibold text-zinc-100 sm:text-3xl">Your typing, at a glance</h2>
         </div>
-        <button
-          onClick={() => resultsQuery.refetch()}
-          disabled={resultsQuery.isLoading}
-          className="inline-flex w-full items-center justify-center gap-2 px-4 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-sm font-medium text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
-        >
-          <svg
-            className={`w-4 h-4 ${resultsQuery.isLoading ? "animate-spin" : ""}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
-          Refresh
-        </button>
+        <Link to="/explorer" className={buttonClass}>
+          Open Explorer →
+        </Link>
       </div>
 
-      {resultsQuery.isLoading ? (
-        <LoadingSkeleton />
-      ) : resultsQuery.isError ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mb-4">
-            <svg
-              className="w-8 h-8 text-rose-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-zinc-100 mb-2">
-            Failed to load results
-          </h2>
-          <p className="text-zinc-500 mb-6 text-center max-w-md">
-            {resultsQuery.error instanceof Error
-              ? resultsQuery.error.message
-              : "An unexpected error occurred"}
+      {daysSinceLast >= WELCOME_BACK_DAYS && mainTrack ? (
+        <section className="rounded-2xl border border-amber-700/50 bg-amber-950/30 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-amber-300">
+            Welcome back · last test {formatRelativeDays(lastTest.date)}
           </p>
-          <button
-            onClick={() => resultsQuery.refetch()}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-linear-to-r from-cyan-500 to-blue-600 text-white font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 shadow-lg shadow-cyan-500/20"
-          >
-            Try Again
-          </button>
-        </div>
-      ) : resultsData.length ? (
-        <>
-          <ActivityHeatmap results={resultsData} />
-          <div
-            aria-hidden="true"
-            className="border-t border-zinc-800/50 mb-6 sm:mb-8"
-          />
-          <PeriodFilter
-            years={years}
-            selectedPeriod={selectedPeriod}
-            onPeriodChange={setSelectedPeriod}
-          />
-          <ModeFilter
-            modes={modes}
-            selectedMode={selectedMode}
-            onModeChange={handleModeChange}
-            mode2Options={mode2Options}
-            selectedMode2={selectedMode2}
-            onMode2Change={setSelectedMode2}
-          />
-          <LanguageFilter
-            languages={languages}
-            selectedLanguage={selectedLanguage}
-            onLanguageChange={setSelectedLanguage}
-          />
-          <StatsSummary results={filteredResults} />
-          <ResultsChart results={filteredResults} />
-          <ResultsTable
-            results={filteredResults}
-            onSelectResult={handleResultSelect}
-          />
-        </>
+          <p className="mt-1 text-lg font-semibold text-zinc-100">
+            You left off at {mainTrack.form.toFixed(1)} WPM in {mainTrack.name}.
+          </p>
+          {recovery ? (
+            <p className="mt-1 text-sm text-zinc-300">
+              After your last {recovery.gapDays}-day break your first 5 tests averaged {recovery.after.toFixed(1)} WPM,
+              against {recovery.before.toFixed(1)} before it.
+            </p>
+          ) : null}
+        </section>
       ) : null}
 
-      {selectedResult ? (
-        <ResultDetailsModal
-          details={resultDetailsQuery.data?.data ?? null}
-          isLoading={resultDetailsQuery.isLoading}
-          error={
-            resultDetailsQuery.isError
-              ? resultDetailsQuery.error instanceof Error
-                ? resultDetailsQuery.error.message
-                : "Failed to load result details."
-              : resultDetailsQuery.data?.isValid === false
-                ? (resultDetailsQuery.data.errors[0] ??
-                  "Failed to load result details.")
-                : null
-          }
-          onClose={handleCloseDetails}
+      <section aria-label="Vitals" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+        <StatTile
+          label="Recent average"
+          value={vitals.recent?.toFixed(1) ?? "—"}
+          sub={vitals.previous !== null && vitals.recent !== null ? `last 20 · ${signed(vitals.recent - vitals.previous)} vs prior 20` : "last 20 tests"}
+          color="text-cyan-400"
         />
+        <StatTile label="Best WPM" value={vitals.best?.toFixed(1) ?? "—"} sub={vitals.bestLabel} color="text-emerald-400" />
+        <StatTile label="Accuracy" value={vitals.acc !== null ? `${vitals.acc.toFixed(1)}%` : "—"} sub="average" color="text-amber-400" />
+        <StatTile label="Consistency" value={vitals.cons !== null ? `${vitals.cons.toFixed(1)}%` : "—"} sub="within-test average" color="text-purple-400" />
+        <StatTile
+          label="Time typed"
+          value={`${(lifetimeHours ?? vitals.importedHours).toFixed(1)} h`}
+          sub={lifetimeHours !== null ? `lifetime · ${vitals.importedHours.toFixed(1)} h imported` : "imported results"}
+        />
+      </section>
+
+      <TrackCards tracks={tracks} />
+
+      <CommunityStanding profile={profile} isLoading={profileQuery.isLoading} importedTests={results.length} />
+
+      {hero ? (
+        <section aria-labelledby="insights-heading" className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="insights-heading" className="text-lg font-semibold text-zinc-100 sm:text-xl">
+              Insights
+            </h2>
+            <p className="text-sm text-zinc-400">Strongest patterns first · recomputed from your results</p>
+          </div>
+          <InsightCard insight={hero} hero />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {rest.slice(0, MAX_INSIGHT_CARDS).map((insight) => (
+              <InsightCard key={insight.id} insight={insight} />
+            ))}
+          </div>
+        </section>
       ) : null}
-    </>
+
+      <ActivityHeatmap results={resultsQuery.data?.data ?? []} />
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <PersonalBests personalBests={profile?.personalBests ?? []} />
+        <GoalsSummary goals={goals} />
+      </div>
+    </div>
   );
 }

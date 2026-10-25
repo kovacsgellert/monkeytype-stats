@@ -1,0 +1,298 @@
+import { getRouteApi, useNavigate } from "@tanstack/react-router";
+import { useCallback, useMemo, useState } from "react";
+import { BreakdownTable } from "../components/explorer/BreakdownTable";
+import { ExplorerChart } from "../components/explorer/ExplorerChart";
+import { FilterSidebar } from "../components/explorer/FilterSidebar";
+import { LoadingSkeleton } from "../components/LoadingSkeleton";
+import { ResultDetailsModal } from "../components/ResultDetailsModal";
+import { ResultsTable } from "../components/ResultsTable";
+import { EmptyState, StatTile } from "../components/ui";
+import { formatDate, formatNumber, signed } from "../utils/format";
+import { useProfile } from "../hooks/useProfile";
+import { useResultDetails } from "../hooks/useResultDetails";
+import { useSavedViewMutations, useSavedViews } from "../hooks/useSavedViews";
+import { useTestResults } from "../hooks/useTestResults";
+import type { ExplorerSearch } from "../router";
+import { learningRate, max, mean, recentVsPrevious, totalHours } from "../stats/aggregate";
+import {
+  applyFilter,
+  describeFilter,
+  filterKey,
+  isEmptyFilter,
+  sanitizeFilter,
+  type ResultFilter,
+} from "../stats/filter";
+import { isPerformance } from "../stats/normalize";
+import { cohortKey } from "../stats/tracks";
+import type { Result } from "../types/result";
+
+const routeApi = getRouteApi("/explorer");
+
+const DEFAULT_WINDOWS = [10, 100];
+
+function parseWindows(avg: string | undefined): number[] {
+  if (avg === undefined) return DEFAULT_WINDOWS;
+  if (avg === "none") return [];
+  return avg
+    .split(",")
+    .map(Number)
+    .filter((n) => [10, 20, 100].includes(n));
+}
+
+export function ExplorerPage() {
+  const search = routeApi.useSearch();
+  const navigate = useNavigate({ from: "/explorer" });
+  const { query, results, tracks } = useTestResults();
+  const profileQuery = useProfile();
+  const savedViewsQuery = useSavedViews();
+  const savedViewMutations = useSavedViewMutations();
+  const [selectedResult, setSelectedResult] = useState<Result | null>(null);
+  const resultDetailsQuery = useResultDetails(selectedResult?.id ?? null);
+
+  const filter = useMemo(() => sanitizeFilter(search as Record<string, unknown>), [search]);
+  const tags = profileQuery.data?.tags ?? [];
+
+  const setSearch = useCallback(
+    (patch: Partial<ExplorerSearch>) =>
+      navigate({
+        search: (prev) => {
+          const next: Record<string, unknown> = { ...prev, ...patch };
+          for (const key of Object.keys(next)) if (next[key] === undefined) delete next[key];
+          return next as ExplorerSearch;
+        },
+        replace: true,
+      }),
+    [navigate],
+  );
+
+  const filtered = useMemo(() => applyFilter(results, filter), [results, filter]);
+  const perf = useMemo(() => filtered.filter(isPerformance), [filtered]);
+  const rawById = useMemo(
+    () => new Map((query.data?.data ?? []).map((r) => [r.id, r])),
+    [query.data?.data],
+  );
+  // newest first, like the table always showed
+  const tableResults = useMemo(
+    () => filtered.map((r) => rawById.get(r.id)).filter((r): r is Result => r !== undefined).reverse(),
+    [filtered, rawById],
+  );
+
+  const kpis = useMemo(() => {
+    const wpms = perf.map((r) => r.wpm);
+    const { recent, previous } = recentVsPrevious(wpms, 20);
+    const singleCohort = new Set(perf.map(cohortKey)).size === 1;
+    const rate = singleCohort && perf.length >= 50 ? learningRate(perf) : null;
+    return {
+      avg: mean(wpms),
+      best: max(wpms),
+      recent,
+      previous,
+      acc: mean(perf.map((r) => r.acc)),
+      cons: mean(perf.map((r) => r.consistency)),
+      singleCohort,
+      rate,
+      hours: totalHours(filtered),
+    };
+  }, [perf, filtered]);
+
+  const handleSaveView = () => {
+    if (isEmptyFilter(filter)) {
+      window.alert("Pick some filters first — an empty view would just show everything.");
+      return;
+    }
+    const name = window.prompt("Name this view:");
+    if (!name?.trim()) return;
+    savedViewMutations.create.mutate({ name: name.trim(), filter });
+  };
+
+  const handleDeleteView = (view: { id: string; name: string }) => {
+    if (window.confirm(`Delete the saved view "${view.name}"?`)) savedViewMutations.remove.mutate(view.id);
+  };
+
+  const mutationError =
+    savedViewMutations.create.error ?? savedViewMutations.remove.error ?? null;
+
+  if (query.isLoading) return <LoadingSkeleton />;
+  if (query.isError)
+    return (
+      <EmptyState title="Failed to load results">
+        {query.error instanceof Error ? query.error.message : "An unexpected error occurred"}
+      </EmptyState>
+    );
+  if (results.length === 0)
+    return (
+      <EmptyState title="No results yet">
+        Import your Monkeytype results from the Settings page to get started.
+      </EmptyState>
+    );
+
+  const chips = describeFilter(filter, (id) => tags.find((t) => t.id === id)?.name ?? id);
+  const windows = parseWindows(search.avg);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-semibold text-zinc-100">Explorer</h2>
+          <p className="text-sm text-zinc-400">Filter, chart and drill into every result.</p>
+        </div>
+        <p className="text-sm text-zinc-400">
+          {formatNumber(filtered.length)} tests · {kpis.hours.toFixed(1)} h
+          {filtered.length > 0
+            ? ` · ${formatDate(filtered[0].date)} – ${formatDate(filtered[filtered.length - 1].date)}`
+            : ""}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap items-start gap-6">
+        <div className="w-full lg:w-72 lg:shrink-0">
+          <FilterSidebar
+            results={results}
+            filter={filter}
+            tags={tags}
+            tracks={tracks}
+            savedViews={savedViewsQuery.data ?? []}
+            onChange={(patch) => setSearch(patch)}
+            onReset={() =>
+              navigate({
+                search: (prev) => ({ metric: prev.metric, x: prev.x, group: prev.group, avg: prev.avg, pb: prev.pb, trend: prev.trend }),
+                replace: true,
+              })
+            }
+            onSaveView={handleSaveView}
+            onDeleteView={handleDeleteView}
+            savingView={savedViewMutations.create.isPending}
+          />
+          {mutationError ? (
+            <p role="alert" className="mt-2 text-sm text-rose-400">
+              {mutationError.message}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex min-w-0 flex-1 basis-[560px] flex-col gap-6">
+          {chips.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2" aria-label="Active filters">
+              {chips.map((chip) => (
+                <span
+                  key={chip.field}
+                  className="inline-flex items-center gap-1 rounded-full border border-cyan-800 bg-cyan-950/50 py-1 pl-3 pr-1 text-sm text-cyan-200"
+                >
+                  {chip.label}
+                  <button
+                    type="button"
+                    aria-label={`Remove filter ${chip.label}`}
+                    onClick={() =>
+                      setSearch(
+                        chip.field === "mode"
+                          ? { mode: undefined, mode2: undefined }
+                          : ({ [chip.field]: undefined } as Partial<ResultFilter>),
+                      )
+                    }
+                    className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-cyan-900"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {perf.length === 0 ? (
+            <EmptyState title="No tests match these filters">
+              <button
+                type="button"
+                onClick={() => navigate({ search: {}, replace: true })}
+                className="text-cyan-400 hover:text-cyan-300"
+              >
+                Clear all filters
+              </button>
+            </EmptyState>
+          ) : (
+            <>
+              <section aria-label="Summary" className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+                <StatTile label="Avg WPM" value={kpis.avg!.toFixed(1)} color="text-cyan-400" />
+                <StatTile label="Best WPM" value={kpis.best!.toFixed(1)} color="text-emerald-400" />
+                <StatTile
+                  label="Last 20"
+                  value={kpis.recent!.toFixed(1)}
+                  sub={kpis.previous !== null ? `${signed(kpis.recent! - kpis.previous)} vs prior 20` : undefined}
+                  color="text-cyan-300"
+                />
+                <StatTile label="Accuracy" value={`${kpis.acc!.toFixed(1)}%`} color="text-amber-400" />
+                <StatTile label="Consistency" value={`${kpis.cons!.toFixed(1)}%`} color="text-purple-400" />
+                <StatTile
+                  label="Learning rate"
+                  value={kpis.rate ? `${signed(kpis.rate.wpmPerHour)}/h` : "—"}
+                  sub={
+                    kpis.rate
+                      ? "WPM per recorded hour"
+                      : kpis.singleCohort
+                        ? "needs 50+ tests"
+                        : "mixed settings — pick one track"
+                  }
+                />
+              </section>
+
+              <ExplorerChart
+                results={perf}
+                metric={search.metric ?? "wpm"}
+                xAxis={search.x ?? "date"}
+                windows={windows}
+                showPbs={search.pb !== false}
+                showTrend={search.trend === true}
+                onChange={(patch) =>
+                  setSearch({
+                    metric: patch.metric ?? search.metric,
+                    x: patch.x ?? search.x,
+                    avg:
+                      patch.windows === undefined
+                        ? search.avg
+                        : patch.windows.length === 0
+                          ? "none"
+                          : patch.windows.join(",") === DEFAULT_WINDOWS.join(",")
+                            ? undefined
+                            : patch.windows.join(","),
+                    pb: patch.pb === undefined ? search.pb : patch.pb ? undefined : false,
+                    trend: patch.trend === undefined ? search.trend : patch.trend || undefined,
+                  })
+                }
+              />
+
+              <BreakdownTable
+                results={perf}
+                allResults={filtered}
+                group={search.group ?? "month"}
+                onGroupChange={(group) => setSearch({ group })}
+                onDrill={(patch) => setSearch(patch)}
+              />
+
+              <ResultsTable
+                key={filterKey(filter)}
+                results={tableResults}
+                onSelectResult={setSelectedResult}
+              />
+            </>
+          )}
+        </div>
+      </div>
+
+      {selectedResult ? (
+        <ResultDetailsModal
+          details={resultDetailsQuery.data?.data ?? null}
+          isLoading={resultDetailsQuery.isLoading}
+          error={
+            resultDetailsQuery.isError
+              ? resultDetailsQuery.error instanceof Error
+                ? resultDetailsQuery.error.message
+                : "Failed to load result details."
+              : resultDetailsQuery.data?.isValid === false
+                ? (resultDetailsQuery.data.errors[0] ?? "Failed to load result details.")
+                : null
+          }
+          onClose={() => setSelectedResult(null)}
+        />
+      ) : null}
+    </div>
+  );
+}
