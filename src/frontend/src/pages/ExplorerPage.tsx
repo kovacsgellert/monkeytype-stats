@@ -61,6 +61,7 @@ export function ExplorerPage() {
           return next as ExplorerSearch;
         },
         replace: true,
+        resetScroll: false,
       }),
     [navigate],
   );
@@ -157,6 +158,7 @@ export function ExplorerPage() {
               navigate({
                 search: (prev) => ({ metric: prev.metric, x: prev.x, group: prev.group, avg: prev.avg, pb: prev.pb, trend: prev.trend }),
                 replace: true,
+                resetScroll: false,
               })
             }
             onSaveView={handleSaveView}
