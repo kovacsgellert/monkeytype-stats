@@ -8,7 +8,8 @@ namespace MonkeyTypeStats.Api.Features.Results.GetById;
 
 public class GetResultByIdQueryHandler(
     MonkeyTypeStatsDbContext dbContext,
-    MonkeyTypeApiClient monkeyTypeApiClient
+    MonkeyTypeApiClient monkeyTypeApiClient,
+    MonkeyTypeApiResponseLogger responseLogger
 ) : IRequestHandler<GetResultByIdQuery, OperationResult<ResultDetailsDto>>
 {
     public async Task<OperationResult<ResultDetailsDto>> Handle(
@@ -28,19 +29,17 @@ public class GetResultByIdQueryHandler(
 
         var response = await monkeyTypeApiClient.GetResultByIdAsync(request.Id);
 
-        var responseLog = new MonkeyTypeApiResponseLog
-        {
-            Id = Guid.NewGuid(),
-            Timestamp = DateTime.UtcNow,
-            Endpoint = $"/results/id/{request.Id}",
-            Data = response.RawResponse,
-        };
-
-        dbContext.MonkeyTypeApiResponseLog.Add(responseLog);
+        // saved on every path, so the hourly details job knows this result was already fetched
+        await responseLogger.AddIfChangedAsync(
+            $"/results/id/{request.Id}",
+            response.RawResponse,
+            cancellationToken
+        );
 
         var details = response.ParsedResponse.Data;
         if (details is null)
         {
+            await dbContext.SaveChangesAsync(cancellationToken);
             return OperationResult<ResultDetailsDto>.Error(
                 $"Result details with id '{request.Id}' not found."
             );
@@ -56,6 +55,7 @@ public class GetResultByIdQueryHandler(
             return OperationResult<ResultDetailsDto>.Ok(newResultDetail.ToResultDetailsDto());
         }
 
+        await dbContext.SaveChangesAsync(cancellationToken);
         return OperationResult<ResultDetailsDto>.Error(
             $"Result details with id '{request.Id}' not found."
         );

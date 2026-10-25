@@ -47,7 +47,7 @@ function rollingAverage(values: number[], window: number): number[] {
 }
 
 const pillBase =
-  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200";
+  "px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 sm:px-4 sm:py-2 sm:text-sm";
 const pillActive = (color: string) => `${color} border border-current/50`;
 const pillInactive =
   "bg-zinc-800/50 text-zinc-400 border border-zinc-700/50 hover:bg-zinc-700/50 hover:text-zinc-300";
@@ -134,8 +134,8 @@ export function ResultsChart({ results }: ResultsChartProps) {
   if (results.length === 0) return null;
 
   return (
-    <div className="mb-8 rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-6 backdrop-blur-sm">
-      <div className="flex items-center gap-2 mb-4">
+    <div className="mb-6 rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-4 backdrop-blur-sm sm:mb-8 sm:p-6">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
         {metrics.map((m) => (
           <button
             key={m.key}
@@ -146,7 +146,7 @@ export function ResultsChart({ results }: ResultsChartProps) {
           </button>
         ))}
       </div>
-      <div className="h-64">
+      <div className="h-56 sm:h-64">
         <Line
           data={chartData}
           options={{
@@ -185,7 +185,7 @@ export function ResultsChart({ results }: ResultsChartProps) {
           }}
         />
       </div>
-      <div className="flex items-center gap-2 mt-4">
+      <div className="flex flex-wrap items-center gap-2 mt-4">
         <button
           onClick={() => setShowAvg10((v) => !v)}
           className={`${pillBase} ${showAvg10 ? pillActive("bg-yellow-400/20 text-yellow-400") : pillInactive}`}

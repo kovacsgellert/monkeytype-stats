@@ -118,6 +118,51 @@ public class RestoreBackupCommandHandler(MonkeyTypeStatsDbContext dbContext)
             dbContext.MonkeyTypeApiResponseLog.AddRange(newResponseLogs);
         }
 
+        var profileRecordsAdded =
+            await AddMissingAsync(
+                dbContext.ProfileSnapshots,
+                backup.ProfileSnapshots,
+                e => e.Id,
+                cancellationToken
+            )
+            + await AddMissingAsync(
+                dbContext.LeaderboardSnapshots,
+                backup.LeaderboardSnapshots,
+                e => e.Id,
+                cancellationToken
+            )
+            + await AddMissingAsync(
+                dbContext.SpeedHistogramSnapshots,
+                backup.SpeedHistogramSnapshots,
+                e => e.Id,
+                cancellationToken
+            )
+            + await AddMissingAsync(dbContext.Tags, backup.Tags, e => e.Id, cancellationToken);
+
+        // personal bests are a current-state table, so only restore them into an empty one
+        var personalBestsToAdd = backup.PersonalBests ?? [];
+        if (
+            personalBestsToAdd.Count > 0
+            && !await dbContext.PersonalBests.AnyAsync(cancellationToken)
+        )
+        {
+            dbContext.PersonalBests.AddRange(personalBestsToAdd);
+            profileRecordsAdded += personalBestsToAdd.Count;
+        }
+
+        var savedViewsAdded = await AddMissingAsync(
+            dbContext.SavedViews,
+            backup.SavedViews,
+            e => e.Id,
+            cancellationToken
+        );
+        var goalsAdded = await AddMissingAsync(
+            dbContext.Goals,
+            backup.Goals,
+            e => e.Id,
+            cancellationToken
+        );
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return OperationResult<RestoreBackupResult>.Ok(
@@ -127,8 +172,38 @@ public class RestoreBackupCommandHandler(MonkeyTypeStatsDbContext dbContext)
                 newResultDetails.Count,
                 distinctResultDetails.Count - newResultDetails.Count,
                 newResponseLogs.Count,
-                distinctResponseLogs.Count - newResponseLogs.Count
+                distinctResponseLogs.Count - newResponseLogs.Count,
+                profileRecordsAdded,
+                savedViewsAdded,
+                goalsAdded
             )
         );
+    }
+
+    private static async Task<int> AddMissingAsync<TEntity, TKey>(
+        DbSet<TEntity> set,
+        List<TEntity>? items,
+        Func<TEntity, TKey> keySelector,
+        CancellationToken cancellationToken
+    )
+        where TEntity : class
+        where TKey : notnull
+    {
+        if (items is null || items.Count == 0)
+            return 0;
+
+        // these tables are small, so comparing against every existing key in memory is fine
+        var existingKeys = (await set.AsNoTracking().ToListAsync(cancellationToken))
+            .Select(keySelector)
+            .ToHashSet();
+
+        var newItems = items
+            .GroupBy(keySelector)
+            .Select(group => group.First())
+            .Where(item => !existingKeys.Contains(keySelector(item)))
+            .ToList();
+
+        set.AddRange(newItems);
+        return newItems.Count;
     }
 }

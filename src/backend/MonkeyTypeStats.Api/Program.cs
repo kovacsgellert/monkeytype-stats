@@ -4,9 +4,20 @@ using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Backup.Create;
 using MonkeyTypeStats.Api.Features.Backup.Restore;
+using MonkeyTypeStats.Api.Features.Goals.Create;
+using MonkeyTypeStats.Api.Features.Goals.Delete;
+using MonkeyTypeStats.Api.Features.Goals.Get;
+using MonkeyTypeStats.Api.Features.Goals.Update;
+using MonkeyTypeStats.Api.Features.Profile.Get;
+using MonkeyTypeStats.Api.Features.Profile.GetLeaderboardHistory;
+using MonkeyTypeStats.Api.Features.Profile.Import;
 using MonkeyTypeStats.Api.Features.Results.Get;
 using MonkeyTypeStats.Api.Features.Results.GetById;
 using MonkeyTypeStats.Api.Features.Results.Import;
+using MonkeyTypeStats.Api.Features.SavedViews.Create;
+using MonkeyTypeStats.Api.Features.SavedViews.Delete;
+using MonkeyTypeStats.Api.Features.SavedViews.Get;
+using MonkeyTypeStats.Api.Features.SavedViews.Update;
 using MonkeyTypeStats.Api.Features.Version.Get;
 using MonkeyTypeStats.Api.MonkeyTypeIntegration;
 using MonkeyTypeStats.Api.Services;
@@ -18,7 +29,8 @@ builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
+builder
+    .Services.AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
         ApiKeyAuthenticationHandler.SchemeName,
         _ => { }
@@ -60,6 +72,7 @@ builder.AddImportResultsRateLimiter();
 builder.AddNpgsqlDbContext<MonkeyTypeStatsDbContext>("monkeytype-stats-db");
 
 builder.Services.AddScoped<DbMigrator>();
+builder.Services.AddScoped<MonkeyTypeApiResponseLogger>();
 
 builder.Services.AddHangfire(config =>
     config
@@ -73,6 +86,7 @@ builder.Services.AddHangfireServer();
 
 builder.Services.AddScoped<ImportResultsJob>();
 builder.Services.AddScoped<ImportResultDetailsJob>();
+builder.Services.AddScoped<ImportMonkeyTypeProfileJob>();
 builder.Services.AddSingleton<AppVersionProvider>();
 
 var app = builder.Build();
@@ -108,11 +122,27 @@ recurringJobManager.AddOrUpdate<ImportResultDetailsJob>(
     Cron.Hourly
 );
 
+recurringJobManager.AddOrUpdate<ImportMonkeyTypeProfileJob>(
+    "import-monkeytype-profile",
+    job => job.ExecuteAsync(),
+    Cron.Daily
+);
+
 app.MapGetResultsEndpoint();
 app.MapGetResultByIdEndpoint();
 app.MapImportResultsEndpoint();
 app.MapCreateBackupEndpoint();
 app.MapRestoreBackupEndpoint();
 app.MapGetAppVersionEndpoint();
+app.MapGetMonkeyTypeProfileEndpoint();
+app.MapGetLeaderboardHistoryEndpoint();
+app.MapGetSavedViewsEndpoint();
+app.MapCreateSavedViewEndpoint();
+app.MapUpdateSavedViewEndpoint();
+app.MapDeleteSavedViewEndpoint();
+app.MapGetGoalsEndpoint();
+app.MapCreateGoalEndpoint();
+app.MapUpdateGoalEndpoint();
+app.MapDeleteGoalEndpoint();
 
 app.Run();

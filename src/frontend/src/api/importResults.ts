@@ -3,6 +3,7 @@ import { createApiKeyAuthHeaders } from "./apiKeyAuth";
 
 export type ImportResultsResponse = {
   resultsAdded: number;
+  profileImported: boolean;
 };
 
 export async function importResults(apiKey: string): Promise<ImportResultsResponse> {

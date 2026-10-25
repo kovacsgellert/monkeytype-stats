@@ -21,7 +21,7 @@ const levelClasses = [
 
 // Pill styles shared with the dashboard filters.
 const pillBase =
-  "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200";
+  "px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 sm:px-4 sm:py-2 sm:text-sm";
 const pillActive = "bg-cyan-500/20 text-cyan-400 border border-cyan-500/50";
 const pillInactive =
   "bg-zinc-800/50 text-zinc-400 border border-zinc-700/50 hover:bg-zinc-700/50 hover:text-zinc-300";
@@ -30,6 +30,7 @@ const pillInactive =
 const LABEL_COL_WIDTH = 80; // w-20
 const LABEL_GRID_GAP = 24; // gap-6
 const MAX_CELL = 16;
+const MIN_CELL = 8;
 
 function dateKeyUTC(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -200,7 +201,7 @@ export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
     }
     const tight = Math.floor((available - (weekCount - 1) * 2) / weekCount);
     return {
-      cellSize: Math.max(Math.min(tight, MAX_CELL), 2),
+      cellSize: Math.max(Math.min(tight, MAX_CELL), MIN_CELL),
       colGap: 2,
       showLabels: withLabels,
     };
@@ -212,7 +213,7 @@ export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
   const selectedLabel = range === "12m" ? "last 12 months" : range;
 
   return (
-    <div className="mb-8 rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-6 backdrop-blur-sm">
+    <div className="mb-6 rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-4 backdrop-blur-sm sm:mb-8 sm:p-6">
       <div className="flex flex-wrap items-center gap-2 mb-4">
         {[{ key: "12m", label: "last 12 months" }]
           .concat(years.map((y) => ({ key: String(y), label: String(y) })))
@@ -317,7 +318,7 @@ export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
               onClick={() => setSelectedDay(null)}
             >
           <div
-            className="w-full max-w-sm mx-4 rounded-3xl border border-zinc-800/80 bg-zinc-950/90 shadow-2xl shadow-black/40"
+            className="w-full max-w-sm mx-4 max-h-[85vh] overflow-y-auto rounded-2xl sm:rounded-3xl border border-zinc-800/80 bg-zinc-950/90 shadow-2xl shadow-black/40"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"

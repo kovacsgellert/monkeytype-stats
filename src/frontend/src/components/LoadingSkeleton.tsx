@@ -42,7 +42,7 @@ export function LoadingSkeleton() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={`stat-${i}`}
-            className="rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-6"
+            className="rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-4 sm:p-6"
           >
             <div className="h-3 w-16 bg-zinc-800 rounded mb-3 animate-pulse" />
             <div className="h-8 w-20 bg-zinc-800 rounded mb-2 animate-pulse" />
@@ -72,30 +72,34 @@ export function LoadingSkeleton() {
       </div>
 
       <div className="rounded-2xl border border-zinc-800/50 bg-zinc-900/50 overflow-hidden">
-        <div className="border-b border-zinc-800/80 px-6 py-4 flex gap-8">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={`header-${i}`}
-              className="h-3 w-16 bg-zinc-800 rounded animate-pulse"
-            />
-          ))}
-        </div>
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div
-            key={`row-${i}`}
-            className="border-b border-zinc-800/50 px-6 py-4 flex gap-8"
-          >
-            <div className="h-5 w-12 bg-zinc-800 rounded animate-pulse" />
-            <div className="h-5 w-10 bg-zinc-800/70 rounded animate-pulse" />
-            <div className="h-5 w-14 bg-zinc-800/70 rounded animate-pulse" />
-            <div className="h-5 w-14 bg-zinc-800/70 rounded animate-pulse" />
-            <div className="h-5 w-20 bg-zinc-800/50 rounded-full animate-pulse" />
-            <div className="h-5 w-16 bg-zinc-800/50 rounded animate-pulse" />
-            <div className="h-5 w-28 bg-zinc-800/50 rounded animate-pulse" />
-            <div className="h-5 w-9 bg-zinc-800/30 rounded-full animate-pulse" />
+        <div className="overflow-x-auto">
+          <div className="min-w-[720px]">
+            <div className="border-b border-zinc-800/80 px-6 py-4 flex gap-8">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={`header-${i}`}
+                  className="h-3 w-16 bg-zinc-800 rounded animate-pulse"
+                />
+              ))}
+            </div>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={`row-${i}`}
+                className="border-b border-zinc-800/50 px-6 py-4 flex gap-8"
+              >
+                <div className="h-5 w-12 bg-zinc-800 rounded animate-pulse" />
+                <div className="h-5 w-10 bg-zinc-800/70 rounded animate-pulse" />
+                <div className="h-5 w-14 bg-zinc-800/70 rounded animate-pulse" />
+                <div className="h-5 w-14 bg-zinc-800/70 rounded animate-pulse" />
+                <div className="h-5 w-20 bg-zinc-800/50 rounded-full animate-pulse" />
+                <div className="h-5 w-16 bg-zinc-800/50 rounded animate-pulse" />
+                <div className="h-5 w-28 bg-zinc-800/50 rounded animate-pulse" />
+                <div className="h-5 w-9 bg-zinc-800/30 rounded-full animate-pulse" />
+              </div>
+            ))}
           </div>
-        ))}
-        <div className="border-t border-zinc-800/50 px-6 py-4 flex items-center justify-between">
+        </div>
+        <div className="border-t border-zinc-800/50 px-4 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="flex items-center gap-2">
             <div className="h-3 w-10 bg-zinc-800 rounded animate-pulse" />
             {Array.from({ length: 3 }).map((_, i) => (

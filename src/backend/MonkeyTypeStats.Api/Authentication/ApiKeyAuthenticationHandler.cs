@@ -24,9 +24,7 @@ public sealed class ApiKeyAuthenticationHandler(
         var configuredApiKey = configuration[ConfigKey];
         if (string.IsNullOrWhiteSpace(configuredApiKey))
         {
-            return Task.FromResult(
-                AuthenticateResult.Fail("API key is not configured.")
-            );
+            return Task.FromResult(AuthenticateResult.Fail("API key is not configured."));
         }
 
         if (!Request.Headers.TryGetValue(AuthorizationHeaderName, out var providedApiKey))

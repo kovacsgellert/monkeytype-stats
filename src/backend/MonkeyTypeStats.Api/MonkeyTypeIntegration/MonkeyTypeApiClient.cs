@@ -87,6 +87,71 @@ public class MonkeyTypeApiClient
         };
     }
 
+    public Task<MonkeyTypeApiCallResult<UserStatsData>> GetUserStatsAsync() =>
+        GetAsync<UserStatsData>("/users/stats");
+
+    public Task<MonkeyTypeApiCallResult<StreakData>> GetStreakAsync() =>
+        GetAsync<StreakData>("/users/streak");
+
+    public Task<MonkeyTypeApiCallResult<List<TagData>>> GetTagsAsync() =>
+        GetAsync<List<TagData>>("/users/tags");
+
+    public Task<
+        MonkeyTypeApiCallResult<Dictionary<string, List<PersonalBestData>>>
+    > GetPersonalBestsAsync(string mode) =>
+        GetAsync<Dictionary<string, List<PersonalBestData>>>($"/users/personalBests?mode={mode}");
+
+    public Task<MonkeyTypeApiCallResult<LeaderboardRankData>> GetLeaderboardRankAsync(
+        string language,
+        string mode,
+        string mode2
+    ) =>
+        GetAsync<LeaderboardRankData>(
+            $"/leaderboards/rank?language={language}&mode={mode}&mode2={mode2}"
+        );
+
+    public Task<MonkeyTypeApiCallResult<LeaderboardData>> GetLeaderboardAsync(
+        string language,
+        string mode,
+        string mode2
+    ) =>
+        GetAsync<LeaderboardData>(
+            $"/leaderboards?language={language}&mode={mode}&mode2={mode2}&pageSize=10"
+        );
+
+    public Task<MonkeyTypeApiCallResult<Dictionary<string, int>>> GetSpeedHistogramAsync(
+        string language,
+        string mode,
+        string mode2
+    ) =>
+        GetAsync<Dictionary<string, int>>(
+            $"/public/speedHistogram?language={language}&mode={mode}&mode2={mode2}"
+        );
+
+    private async Task<MonkeyTypeApiCallResult<T>> GetAsync<T>(string endpoint)
+    {
+        var response = await _httpClient.GetAsync(endpoint);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            await HandleErrorResponse(response, endpoint);
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+        var parsedResponse =
+            JsonSerializer.Deserialize<MonkeyTypeApiResponse<T>>(content, jsonOptions)
+            ?? throw new InvalidOperationException(
+                $"Failed to deserialize MonkeyType response from {endpoint}."
+            );
+
+        return new MonkeyTypeApiCallResult<T>
+        {
+            Endpoint = endpoint,
+            RawResponse = content,
+            ParsedResponse = parsedResponse,
+        };
+    }
+
     private async Task HandleErrorResponse(HttpResponseMessage response, string endpoint)
     {
         var content = string.Empty;

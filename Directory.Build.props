@@ -7,6 +7,6 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <NoWarn>$(NoWarn);ASPIRECOMPUTE003;ASPIREPIPELINES003</NoWarn>
+        <NoWarn>$(NoWarn);ASPIRECOMPUTE003;ASPIREPIPELINES003;ASPIRE010</NoWarn>
     </PropertyGroup>
 </Project>

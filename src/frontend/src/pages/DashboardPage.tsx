@@ -117,7 +117,7 @@ export function DashboardPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h2 className="text-2xl font-semibold text-zinc-100">Dashboard</h2>
           <p className="text-sm text-zinc-500">
@@ -127,7 +127,7 @@ export function DashboardPage() {
         <button
           onClick={() => resultsQuery.refetch()}
           disabled={resultsQuery.isLoading}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-sm font-medium text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex w-full items-center justify-center gap-2 px-4 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-sm font-medium text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
         >
           <svg
             className={`w-4 h-4 ${resultsQuery.isLoading ? "animate-spin" : ""}`}
@@ -185,7 +185,7 @@ export function DashboardPage() {
           <ActivityHeatmap results={resultsData} />
           <div
             aria-hidden="true"
-            className="border-t border-zinc-800/50 mb-8"
+            className="border-t border-zinc-800/50 mb-6 sm:mb-8"
           />
           <PeriodFilter
             years={years}

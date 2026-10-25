@@ -17,10 +17,113 @@ namespace MonkeyTypeStats.Api.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.3")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("MonkeyTypeStats.Api.Data.Goal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("AchievedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("ArchivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("Deadline")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Filter")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("Target")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("WindowSize")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Goals");
+                });
+
+            modelBuilder.Entity("MonkeyTypeStats.Api.Data.LeaderboardSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double?>("Acc")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("CapturedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("Consistency")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime?>("EntryTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("FriendsRank")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int?>("LeaderboardSize")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Mode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Mode2")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int?>("Rank")
+                        .HasColumnType("integer");
+
+                    b.Property<double?>("Raw")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("Wpm")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Language", "Mode", "Mode2", "CapturedAt");
+
+                    b.ToTable("LeaderboardSnapshots");
+                });
 
             modelBuilder.Entity("MonkeyTypeStats.Api.Data.MonkeyTypeApiResponseLog", b =>
                 {
@@ -43,6 +146,99 @@ namespace MonkeyTypeStats.Api.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MonkeyTypeApiResponseLog");
+                });
+
+            modelBuilder.Entity("MonkeyTypeStats.Api.Data.PersonalBest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double?>("Acc")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("Consistency")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Difficulty")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("ImportedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Language")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool?>("LazyMode")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Mode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Mode2")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool?>("Numbers")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("Punctuation")
+                        .HasColumnType("boolean");
+
+                    b.Property<double?>("Raw")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("Wpm")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PersonalBests");
+                });
+
+            modelBuilder.Entity("MonkeyTypeStats.Api.Data.ProfileSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CapturedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CompletedTests")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("LastResultTimestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MaxStreakLength")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StartedTests")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("StreakHourOffset")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StreakLength")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("TimeTypingSeconds")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CapturedAt");
+
+                    b.ToTable("ProfileSnapshots");
                 });
 
             modelBuilder.Entity("MonkeyTypeStats.Api.Data.Result", b =>
@@ -258,6 +454,86 @@ namespace MonkeyTypeStats.Api.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ResultDetails");
+                });
+
+            modelBuilder.Entity("MonkeyTypeStats.Api.Data.SavedView", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Filter")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SavedViews");
+                });
+
+            modelBuilder.Entity("MonkeyTypeStats.Api.Data.SpeedHistogramSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Buckets")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime>("CapturedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Mode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Mode2")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Language", "Mode", "Mode2", "CapturedAt");
+
+                    b.ToTable("SpeedHistogramSnapshots");
+                });
+
+            modelBuilder.Entity("MonkeyTypeStats.Api.Data.Tag", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
                 });
 #pragma warning restore 612, 618
         }

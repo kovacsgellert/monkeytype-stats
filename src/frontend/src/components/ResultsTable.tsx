@@ -64,7 +64,7 @@ function SortableHeader({
 
   return (
     <th
-      className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 cursor-pointer hover:text-zinc-300 transition-colors select-none"
+      className="px-3 sm:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 cursor-pointer hover:text-zinc-300 transition-colors select-none"
       onClick={() => onSort(column)}
     >
       <div className="flex items-center gap-1.5">
@@ -150,7 +150,7 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-zinc-800/50 bg-zinc-900/50 backdrop-blur-sm shadow-2xl shadow-black/20">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[720px]">
           <thead>
             <tr className="border-b border-zinc-800/80">
               <SortableHeader
@@ -160,7 +160,7 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
                 direction={sortDirection}
                 onSort={handleSort}
               />
-              <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
                 Raw
               </th>
               <SortableHeader
@@ -177,10 +177,10 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
                 direction={sortDirection}
                 onSort={handleSort}
               />
-              <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
                 Mode
               </th>
-              <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
                 Language
               </th>
               <SortableHeader
@@ -190,7 +190,7 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
                 direction={sortDirection}
                 onSort={handleSort}
               />
-              <th className="px-6 py-4 text-right text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <th className="px-3 sm:px-6 py-4 text-right text-xs font-medium uppercase tracking-wider text-zinc-500">
                 Details
               </th>
             </tr>
@@ -204,33 +204,33 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
                   animationDelay: `${index * 30}ms`,
                 }}
               >
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <span
                     className={`font-mono text-lg font-bold ${getWpmColor(result.wpm)}`}
                   >
                     {Math.round(result.wpm)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <span className="font-mono text-zinc-400">
                     {Math.round(result.rawWpm)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <span
                     className={`font-mono font-medium ${getAccuracyColor(result.acc)}`}
                   >
                     {result.acc.toFixed(1)}%
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <span
                     className={`font-mono font-medium ${getConsistencyColor(result.consistency)}`}
                   >
                     {result.consistency.toFixed(1)}%
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-800/80 px-3 py-1 text-xs font-medium text-zinc-300">
                     {result.mode === "quote" ? (
                       <span className="capitalize">Quote</span>
@@ -242,17 +242,17 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
                     )}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <span className="text-sm text-zinc-400">
                     {formatLanguage(result.language || "english")}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <span className="text-sm text-zinc-500">
                     {formatDate(result.timestamp)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right">
                   <button
                     onClick={() => onSelectResult?.(result)}
                     className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 transition hover:bg-cyan-500/20 hover:text-cyan-200"
@@ -281,7 +281,7 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
       </div>
 
       {/* Pagination Controls */}
-      <div className="border-t border-zinc-800/50 px-6 py-4 flex items-center justify-between">
+      <div className="border-t border-zinc-800/50 px-3 sm:px-6 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm text-zinc-500">Show:</span>
           {PAGE_SIZE_OPTIONS.map((size) => (
@@ -299,7 +299,7 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
           ))}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 sm:justify-end">
           <span className="text-sm text-zinc-500">
             {currentPage * pageSize + 1}-
             {Math.min((currentPage + 1) * pageSize, sortedResults.length)} of{" "}
