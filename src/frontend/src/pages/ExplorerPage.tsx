@@ -2,7 +2,7 @@ import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 import { BreakdownTable } from "../components/explorer/BreakdownTable";
 import { ExplorerChart } from "../components/explorer/ExplorerChart";
-import { FilterSidebar } from "../components/explorer/FilterSidebar";
+import { FilterBar } from "../components/explorer/FilterBar";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 import { ResultDetailsModal } from "../components/ResultDetailsModal";
 import { ResultsTable } from "../components/ResultsTable";
@@ -14,14 +14,7 @@ import { useSavedViewMutations, useSavedViews } from "../hooks/useSavedViews";
 import { useTestResults } from "../hooks/useTestResults";
 import type { ExplorerSearch } from "../router";
 import { learningRate, max, mean, recentVsPrevious, totalHours } from "../stats/aggregate";
-import {
-  applyFilter,
-  describeFilter,
-  filterKey,
-  isEmptyFilter,
-  sanitizeFilter,
-  type ResultFilter,
-} from "../stats/filter";
+import { applyFilter, filterKey, isEmptyFilter, sanitizeFilter } from "../stats/filter";
 import { isPerformance } from "../stats/normalize";
 import { cohortKey } from "../stats/tracks";
 import type { Result } from "../types/result";
@@ -136,7 +129,6 @@ export function ExplorerPage() {
       </EmptyState>
     );
 
-  const chips = describeFilter(filter, (id) => tags.find((t) => t.id === id)?.name ?? id);
   const windows = parseWindows(search.avg);
 
   return (
@@ -154,64 +146,34 @@ export function ExplorerPage() {
         </p>
       </div>
 
-      <div className="flex flex-wrap items-start gap-6">
-        {/* on desktop the filters stay in view below the sticky nav and scroll on their own if taller;
-            the height leaves room for the footer so they never slide under the nav at the page end */}
-        <div className="w-full lg:sticky lg:top-28 lg:w-72 lg:shrink-0 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto lg:overscroll-contain">
+      {/* sticks right below the 89px nav from sm up; on phones it wraps to several rows, so it scrolls away */}
+      <div className="relative z-10 sm:sticky sm:top-[89px]">
+        <FilterBar
+          results={results}
+          filter={filter}
+          tags={tags}
+          tracks={tracks}
+          savedViews={savedViewsQuery.data ?? []}
+          onChange={(patch) => setSearch(patch)}
+          onReset={() =>
+            navigate({
+              search: (prev) => ({ metric: prev.metric, x: prev.x, group: prev.group, avg: prev.avg, pb: prev.pb, trend: prev.trend }),
+              replace: true,
+              resetScroll: false,
+            })
+          }
+          onSaveView={handleSaveView}
+          onDeleteView={handleDeleteView}
+          savingView={savedViewMutations.create.isPending}
+        />
+        {mutationError ? (
+          <p role="alert" className="mt-2 text-sm text-rose-400">
+            {mutationError.message}
+          </p>
+        ) : null}
+      </div>
 
-          <FilterSidebar
-            results={results}
-            filter={filter}
-            tags={tags}
-            tracks={tracks}
-            savedViews={savedViewsQuery.data ?? []}
-            onChange={(patch) => setSearch(patch)}
-            onReset={() =>
-              navigate({
-                search: (prev) => ({ metric: prev.metric, x: prev.x, group: prev.group, avg: prev.avg, pb: prev.pb, trend: prev.trend }),
-                replace: true,
-                resetScroll: false,
-              })
-            }
-            onSaveView={handleSaveView}
-            onDeleteView={handleDeleteView}
-            savingView={savedViewMutations.create.isPending}
-          />
-          {mutationError ? (
-            <p role="alert" className="mt-2 text-sm text-rose-400">
-              {mutationError.message}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex min-w-0 flex-1 basis-[560px] flex-col gap-6">
-          {chips.length > 0 ? (
-            <div className="flex flex-wrap items-center gap-2" aria-label="Active filters">
-              {chips.map((chip) => (
-                <span
-                  key={chip.field}
-                  className="inline-flex items-center gap-1 rounded-full border border-cyan-800 bg-cyan-950/50 py-1 pl-3 pr-1 text-sm text-cyan-200"
-                >
-                  {chip.label}
-                  <button
-                    type="button"
-                    aria-label={`Remove filter ${chip.label}`}
-                    onClick={() =>
-                      setSearch(
-                        chip.field === "mode"
-                          ? { mode: undefined, mode2: undefined }
-                          : ({ [chip.field]: undefined } as Partial<ResultFilter>),
-                      )
-                    }
-                    className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-cyan-900"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          ) : null}
-
+      <div className="flex min-w-0 flex-col gap-6">
           {perf.length === 0 ? (
             <EmptyState title="No tests match these filters">
               <button
@@ -288,7 +250,6 @@ export function ExplorerPage() {
               />
             </>
           )}
-        </div>
       </div>
 
       {selectedResult ? (
