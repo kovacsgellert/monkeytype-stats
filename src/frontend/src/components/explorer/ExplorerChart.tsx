@@ -32,8 +32,8 @@ const metrics: { key: ExplorerMetric; label: string; unit: string; color: string
 ];
 
 const xAxes: { key: ExplorerXAxis; label: string }[] = [
-  { key: "date", label: "Date" },
   { key: "test", label: "Test #" },
+  { key: "date", label: "Date" },
   { key: "hours", label: "Recorded hours" },
 ];
 

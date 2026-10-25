@@ -237,7 +237,7 @@ export function ExplorerPage() {
               <ExplorerChart
                 results={perf}
                 metric={search.metric ?? "wpm"}
-                xAxis={search.x ?? "date"}
+                xAxis={search.x ?? "test"}
                 windows={windows}
                 showPbs={search.pb !== false}
                 showTrend={search.trend === true}
