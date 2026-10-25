@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { createBackup, restoreBackup } from "../api/backup";
 import { importResults } from "../api/importResults";
 import { useAppVersion } from "../hooks/useAppVersion";
+import { useAuth } from "../hooks/useAuth";
 
 export function SettingsPage() {
   const [selectedBackupFile, setSelectedBackupFile] = useState<File | null>(
@@ -16,9 +17,10 @@ export function SettingsPage() {
   const [restoreDetails, setRestoreDetails] = useState<string | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const appVersionQuery = useAppVersion();
+  const { withLogin } = useAuth();
 
   const createBackupMutation = useMutation({
-    mutationFn: (apiKey: string) => createBackup(apiKey),
+    mutationFn: () => withLogin("create a backup", createBackup),
     onSuccess: ({ blob, fileName }) => {
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -32,8 +34,7 @@ export function SettingsPage() {
   });
 
   const restoreBackupMutation = useMutation({
-    mutationFn: ({ backupFile, apiKey }: { backupFile: File; apiKey: string }) =>
-      restoreBackup(backupFile, apiKey),
+    mutationFn: (backupFile: File) => withLogin("restore a backup", () => restoreBackup(backupFile)),
     onSuccess: (data) => {
       setRestoreSuccess("Backup restored successfully.");
       setRestoreDetails(
@@ -47,7 +48,7 @@ export function SettingsPage() {
   });
 
   const importResultsMutation = useMutation({
-    mutationFn: (apiKey: string) => importResults(apiKey),
+    mutationFn: () => withLogin("import results", importResults),
     onSuccess: (data) => {
       setImportMessage(
         `Import complete. Added ${data.resultsAdded} results.${data.profileImported ? " Profile data updated." : " Profile data could not be updated."}`,
@@ -57,11 +58,7 @@ export function SettingsPage() {
 
   const handleCreateBackup = () => {
     createBackupMutation.reset();
-    const apiKey = window.prompt("Enter API key to create a backup:");
-    if (!apiKey) {
-      return;
-    }
-    createBackupMutation.mutate(apiKey);
+    createBackupMutation.mutate();
   };
 
   const handleRestoreBackup = () => {
@@ -70,24 +67,15 @@ export function SettingsPage() {
       return;
     }
 
-    const apiKey = window.prompt("Enter API key to restore a backup:");
-    if (!apiKey) {
-      return;
-    }
-
     setRestoreErrorMessage(null);
     setRestoreSuccess(null);
     setRestoreDetails(null);
-    restoreBackupMutation.mutate({ backupFile: selectedBackupFile, apiKey });
+    restoreBackupMutation.mutate(selectedBackupFile);
   };
 
   const handleImportResults = () => {
     setImportMessage(null);
-    const apiKey = window.prompt("Enter API key to import results:");
-    if (!apiKey) {
-      return;
-    }
-    importResultsMutation.mutate(apiKey);
+    importResultsMutation.mutate();
   };
 
   const restoreError =

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { withApiKey } from "../api/apiClient";
+import { useAuth } from "./useAuth";
 import {
   createSavedView,
   deleteSavedView,
@@ -16,20 +16,21 @@ export function useSavedViews() {
 
 export function useSavedViewMutations() {
   const queryClient = useQueryClient();
+  const { withLogin } = useAuth();
   const onSuccess = () => queryClient.invalidateQueries({ queryKey: savedViewsKey });
 
   const create = useMutation({
     mutationFn: (request: SaveSavedViewRequest) =>
-      withApiKey("save this view", (key) => createSavedView(request, key)),
+      withLogin("save this view", () => createSavedView(request)),
     onSuccess,
   });
   const update = useMutation({
     mutationFn: ({ id, request }: { id: string; request: SaveSavedViewRequest }) =>
-      withApiKey("update this view", (key) => updateSavedView(id, request, key)),
+      withLogin("update this view", () => updateSavedView(id, request)),
     onSuccess,
   });
   const remove = useMutation({
-    mutationFn: (id: string) => withApiKey("delete this view", (key) => deleteSavedView(id, key)),
+    mutationFn: (id: string) => withLogin("delete this view", () => deleteSavedView(id)),
     onSuccess,
   });
 

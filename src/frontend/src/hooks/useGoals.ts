@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "./useAuth";
 import { createGoal, deleteGoal, fetchGoals, updateGoal, type SaveGoalRequest } from "../api/goals";
-import { withApiKey } from "../api/apiClient";
 
 const goalsKey = ["goals"];
 
@@ -10,20 +10,21 @@ export function useGoals() {
 
 export function useGoalMutations() {
   const queryClient = useQueryClient();
+  const { withLogin } = useAuth();
   const onSuccess = () => queryClient.invalidateQueries({ queryKey: goalsKey });
 
   const create = useMutation({
     mutationFn: (request: SaveGoalRequest) =>
-      withApiKey("create this goal", (key) => createGoal(request, key)),
+      withLogin("create this goal", () => createGoal(request)),
     onSuccess,
   });
   const update = useMutation({
     mutationFn: ({ id, request }: { id: string; request: SaveGoalRequest }) =>
-      withApiKey("update this goal", (key) => updateGoal(id, request, key)),
+      withLogin("update this goal", () => updateGoal(id, request)),
     onSuccess,
   });
   const remove = useMutation({
-    mutationFn: (id: string) => withApiKey("delete this goal", (key) => deleteGoal(id, key)),
+    mutationFn: (id: string) => withLogin("delete this goal", () => deleteGoal(id)),
     onSuccess,
   });
 

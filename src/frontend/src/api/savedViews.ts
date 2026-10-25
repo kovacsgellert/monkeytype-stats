@@ -20,14 +20,14 @@ export function fetchSavedViews(): Promise<SavedView[]> {
   return apiRequest<SavedView[]>("api/saved-views");
 }
 
-export function createSavedView(request: SaveSavedViewRequest, apiKey: string) {
-  return apiRequest<SavedView>("api/saved-views", { method: "POST", body: request, apiKey });
+export function createSavedView(request: SaveSavedViewRequest) {
+  return apiRequest<SavedView>("api/saved-views", { method: "POST", body: request });
 }
 
-export function updateSavedView(id: string, request: SaveSavedViewRequest, apiKey: string) {
-  return apiRequest<SavedView>(`api/saved-views/${id}`, { method: "PUT", body: request, apiKey });
+export function updateSavedView(id: string, request: SaveSavedViewRequest) {
+  return apiRequest<SavedView>(`api/saved-views/${id}`, { method: "PUT", body: request });
 }
 
-export function deleteSavedView(id: string, apiKey: string) {
-  return apiRequest<null>(`api/saved-views/${id}`, { method: "DELETE", apiKey });
+export function deleteSavedView(id: string) {
+  return apiRequest<null>(`api/saved-views/${id}`, { method: "DELETE" });
 }

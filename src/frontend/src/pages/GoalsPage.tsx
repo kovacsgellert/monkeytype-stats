@@ -4,6 +4,7 @@ import { GoalCard } from "../components/goals/GoalCard";
 import { GoalForm } from "../components/goals/GoalForm";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 import { EmptyState, primaryButtonClass } from "../components/ui";
+import { useAuth } from "../hooks/useAuth";
 import { useGoalMutations } from "../hooks/useGoals";
 import { useGoalProgress, type GoalWithProgress } from "../hooks/useGoalProgress";
 
@@ -13,6 +14,7 @@ export function GoalsPage() {
   const { goalsQuery, resultsQuery, goals, tracks, results } = useGoalProgress();
   const { create, update, remove } = useGoalMutations();
   const [editing, setEditing] = useState<Editing>(null);
+  const { ensureLoggedIn } = useAuth();
   const [showArchived, setShowArchived] = useState(false);
 
   const languages = useMemo(() => [...new Set(results.map((r) => r.language))].sort(), [results]);
@@ -20,6 +22,13 @@ export function GoalsPage() {
   const active = goals.filter((g) => !g.goal.archivedAt && !g.goal.achievedAt);
   const achieved = goals.filter((g) => !g.goal.archivedAt && g.goal.achievedAt);
   const archived = goals.filter((g) => g.goal.archivedAt);
+
+  // Ask for a login before opening the form, so nobody fills it in only to be stopped on save
+  const startEditing = (next: NonNullable<Editing>) =>
+    ensureLoggedIn(next.kind === "new" ? "create a goal" : "edit this goal").then(
+      () => setEditing(next),
+      () => {},
+    );
 
   const save = (request: SaveGoalRequest) => {
     const onSuccess = () => setEditing(null);
@@ -34,7 +43,7 @@ export function GoalsPage() {
     <GoalCard
       key={item.goal.id}
       item={item}
-      onEdit={() => setEditing({ kind: "edit", goal: item.goal })}
+      onEdit={() => startEditing({ kind: "edit", goal: item.goal })}
       onArchive={() => patch(item.goal, { archivedAt: item.goal.archivedAt ? null : new Date().toISOString() })}
       onDelete={() => {
         if (window.confirm(`Delete the goal "${item.goal.title}"?`)) remove.mutate(item.goal.id);
@@ -56,7 +65,7 @@ export function GoalsPage() {
           <p className="text-sm text-zinc-400">Set a target and watch your progress. Progress is calculated from your results.</p>
         </div>
         {editing === null ? (
-          <button type="button" onClick={() => setEditing({ kind: "new" })} className={primaryButtonClass}>
+          <button type="button" onClick={() => startEditing({ kind: "new" })} className={primaryButtonClass}>
             + New goal
           </button>
         ) : null}

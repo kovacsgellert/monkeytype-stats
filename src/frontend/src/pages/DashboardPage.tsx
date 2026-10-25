@@ -9,6 +9,7 @@ import { TrackCards } from "../components/dashboard/TrackCards";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 import { buttonClass, EmptyState, StatTile } from "../components/ui";
 import { formatDate, formatNumber, formatRelativeDays, signed } from "../utils/format";
+import { canWrite, useCurrentUser } from "../hooks/useAuth";
 import { useGoalProgress } from "../hooks/useGoalProgress";
 import { useProfile } from "../hooks/useProfile";
 import { max, mean, recentVsPrevious, totalHours } from "../stats/aggregate";
@@ -21,6 +22,7 @@ const MAX_INSIGHT_CARDS = 6;
 export function DashboardPage() {
   const { resultsQuery, results, tracks, goals } = useGoalProgress();
   const profileQuery = useProfile();
+  const currentUser = useCurrentUser();
   const profile = profileQuery.data;
 
   const insights = useMemo(() => computeInsights({ results, tracks }), [results, tracks]);
@@ -57,11 +59,17 @@ export function DashboardPage() {
   if (results.length === 0)
     return (
       <EmptyState title="No results yet">
-        Import your Monkeytype results from{" "}
-        <Link to="/settings" className="text-cyan-400 hover:text-cyan-300">
-          Settings
-        </Link>{" "}
-        to see your insights.
+        {canWrite(currentUser.data) ? (
+          <>
+            Import your Monkeytype results from{" "}
+            <Link to="/settings" className="text-cyan-400 hover:text-cyan-300">
+              Settings
+            </Link>{" "}
+            to see your insights.
+          </>
+        ) : (
+          "Results are imported from Monkeytype once a day. Check back after the next import."
+        )}
       </EmptyState>
     );
 

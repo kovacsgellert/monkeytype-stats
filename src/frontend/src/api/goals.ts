@@ -54,14 +54,14 @@ export function fetchGoals(): Promise<Goal[]> {
   return apiRequest<Goal[]>("api/goals");
 }
 
-export function createGoal(request: SaveGoalRequest, apiKey: string) {
-  return apiRequest<Goal>("api/goals", { method: "POST", body: request, apiKey });
+export function createGoal(request: SaveGoalRequest) {
+  return apiRequest<Goal>("api/goals", { method: "POST", body: request });
 }
 
-export function updateGoal(id: string, request: SaveGoalRequest, apiKey: string) {
-  return apiRequest<Goal>(`api/goals/${id}`, { method: "PUT", body: request, apiKey });
+export function updateGoal(id: string, request: SaveGoalRequest) {
+  return apiRequest<Goal>(`api/goals/${id}`, { method: "PUT", body: request });
 }
 
-export function deleteGoal(id: string, apiKey: string) {
-  return apiRequest<null>(`api/goals/${id}`, { method: "DELETE", apiKey });
+export function deleteGoal(id: string) {
+  return apiRequest<null>(`api/goals/${id}`, { method: "DELETE" });
 }
