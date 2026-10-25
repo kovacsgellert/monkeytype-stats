@@ -426,3 +426,6 @@ results/
 
 # .NET local tools restore stamp (see Directory.Build.targets)
 .config/.dotnet-tools.restored
+
+# Local planning docs (not committed)
+docs/plans/
