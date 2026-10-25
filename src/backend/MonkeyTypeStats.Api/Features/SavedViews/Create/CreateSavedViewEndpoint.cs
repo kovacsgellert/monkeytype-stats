@@ -1,4 +1,5 @@
 using MediatR;
+using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Features.SavedViews.Common;
 
@@ -17,7 +18,7 @@ public static class CreateSavedViewEndpoint
                 }
             )
             .WithName("CreateSavedView")
-            .RequireAuthorization("ApiKey");
+            .RequireAuthorization(AuthPolicies.Admin);
 
         return app;
     }

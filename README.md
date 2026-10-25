@@ -47,6 +47,15 @@ The main goals of this project are:
 Before deployment adjust the image versions in the docker-compose.yaml to use the latest images and set up the variables in the .env file.
 The buttons on the Settings page are protected with ApiKey auth, you will be prompted to input the ApiKey that you defined as the MONKEYTYPE_STATS_API_KEY env var.
 
+### Admin login
+
+All endpoints that change data accept either the API key or a logged-in admin session (cookie, via `POST /api/auth/login`).
+There is exactly one admin account and no registration:
+
+- `MONKEYTYPE_STATS_ADMIN_EMAIL` / `MONKEYTYPE_STATS_ADMIN_PASSWORD`: the admin account is created from these on first boot. Changing the email later renames the existing admin.
+- The password is only applied when the account is created. To change it, update `MONKEYTYPE_STATS_ADMIN_PASSWORD`, set `MONKEYTYPE_STATS_ADMIN_RESET_PASSWORD=true` for one restart, then set it back to `false`.
+- `MONKEYTYPE_STATS_AUTH_DISABLED=true` turns off login and API key protection completely. Only use this for a stack that is not reachable from the internet.
+
 Example deployment: [typing.kovacsgellert.dev](https://typing.kovacsgellert.dev)
 
 ## AI usage disclosure

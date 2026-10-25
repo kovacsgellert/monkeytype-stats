@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace MonkeyTypeStats.Api.Data;
 
-public class MonkeyTypeStatsDbContext : DbContext
+public class MonkeyTypeStatsDbContext : IdentityDbContext<AppUser>, IDataProtectionKeyContext
 {
     public MonkeyTypeStatsDbContext(DbContextOptions<MonkeyTypeStatsDbContext> options)
         : base(options) { }
@@ -28,8 +30,12 @@ public class MonkeyTypeStatsDbContext : DbContext
 
     public DbSet<Goal> Goals => Set<Goal>();
 
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<MonkeyTypeApiResponseLog>(entity =>
         {
             entity.HasKey(e => e.Id);

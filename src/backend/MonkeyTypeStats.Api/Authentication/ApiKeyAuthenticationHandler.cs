@@ -54,7 +54,11 @@ public sealed class ApiKeyAuthenticationHandler(
             return Task.FromResult(AuthenticateResult.Fail("Invalid API key."));
         }
 
-        var claims = new[] { new Claim(ClaimTypes.Name, "Admin") };
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.Name, "Admin"),
+            new Claim(ClaimTypes.Role, AuthRoles.Admin),
+        };
         var identity = new ClaimsIdentity(claims, SchemeName);
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, SchemeName);

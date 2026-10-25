@@ -1,7 +1,9 @@
 using Hangfire;
-using Microsoft.AspNetCore.Authentication;
 using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Data;
+using MonkeyTypeStats.Api.Features.Auth.GetCurrentUser;
+using MonkeyTypeStats.Api.Features.Auth.Login;
+using MonkeyTypeStats.Api.Features.Auth.Logout;
 using MonkeyTypeStats.Api.Features.Backup.Create;
 using MonkeyTypeStats.Api.Features.Backup.Restore;
 using MonkeyTypeStats.Api.Features.Goals.Create;
@@ -29,22 +31,7 @@ builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
 
-builder
-    .Services.AddAuthentication(ApiKeyAuthenticationHandler.SchemeName)
-    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
-        ApiKeyAuthenticationHandler.SchemeName,
-        _ => { }
-    );
-
-builder.Services.AddAuthorization(options =>
-    options.AddPolicy(
-        "ApiKey",
-        policy =>
-            policy
-                .RequireAuthenticatedUser()
-                .AddAuthenticationSchemes(ApiKeyAuthenticationHandler.SchemeName)
-    )
-);
+builder.AddAppAuthentication();
 
 var monkeyTypeApiConfig = builder.Configuration.GetSection("MonkeyTypeApi");
 
@@ -95,6 +82,9 @@ using (var scope = app.Services.CreateScope())
 {
     var dbMigrator = scope.ServiceProvider.GetRequiredService<DbMigrator>();
     await dbMigrator.MigrateAsync();
+
+    var adminSeeder = scope.ServiceProvider.GetRequiredService<AdminSeeder>();
+    await adminSeeder.SeedAsync();
 }
 
 if (app.Environment.IsDevelopment())
@@ -128,6 +118,9 @@ recurringJobManager.AddOrUpdate<ImportMonkeyTypeProfileJob>(
     Cron.Daily
 );
 
+app.MapLoginEndpoint();
+app.MapLogoutEndpoint();
+app.MapGetCurrentUserEndpoint();
 app.MapGetResultsEndpoint();
 app.MapGetResultByIdEndpoint();
 app.MapImportResultsEndpoint();
