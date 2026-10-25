@@ -155,7 +155,10 @@ export function ExplorerPage() {
       </div>
 
       <div className="flex flex-wrap items-start gap-6">
-        <div className="w-full lg:w-72 lg:shrink-0">
+        {/* on desktop the filters stay in view below the sticky nav and scroll on their own if taller;
+            the height leaves room for the footer so they never slide under the nav at the page end */}
+        <div className="w-full lg:sticky lg:top-28 lg:w-72 lg:shrink-0 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto lg:overscroll-contain">
+
           <FilterSidebar
             results={results}
             filter={filter}
