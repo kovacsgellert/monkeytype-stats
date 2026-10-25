@@ -1,4 +1,5 @@
 using MediatR;
+using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Common;
 
 namespace MonkeyTypeStats.Api.Features.Goals.Delete;
@@ -16,7 +17,7 @@ public static class DeleteGoalEndpoint
                 }
             )
             .WithName("DeleteGoal")
-            .RequireAuthorization("ApiKey");
+            .RequireAuthorization(AuthPolicies.Admin);
 
         return app;
     }

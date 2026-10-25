@@ -1,5 +1,6 @@
 using System.Threading.RateLimiting;
 using MediatR;
+using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Common;
 
 namespace MonkeyTypeStats.Api.Features.Results.Import;
@@ -53,7 +54,7 @@ public static class ImportResultsEndpoint
                 }
             )
             .WithName("ImportResults")
-            .RequireAuthorization("ApiKey")
+            .RequireAuthorization(AuthPolicies.Admin)
             .RequireRateLimiting("import-results");
 
         return app;

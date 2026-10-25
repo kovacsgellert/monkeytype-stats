@@ -1,4 +1,5 @@
 using MediatR;
+using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Common;
 using MonkeyTypeStats.Api.Features.Goals.Common;
 
@@ -17,7 +18,7 @@ public static class UpdateGoalEndpoint
                 }
             )
             .WithName("UpdateGoal")
-            .RequireAuthorization("ApiKey");
+            .RequireAuthorization(AuthPolicies.Admin);
 
         return app;
     }

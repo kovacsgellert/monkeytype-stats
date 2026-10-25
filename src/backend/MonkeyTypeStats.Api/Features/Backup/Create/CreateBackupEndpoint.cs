@@ -1,4 +1,5 @@
 using MediatR;
+using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Common;
 using HttpResults = Microsoft.AspNetCore.Http.Results;
 
@@ -26,7 +27,7 @@ public static class CreateBackupEndpoint
                 }
             )
             .WithName("CreateBackup")
-            .RequireAuthorization("ApiKey");
+            .RequireAuthorization(AuthPolicies.Admin);
 
         return app;
     }

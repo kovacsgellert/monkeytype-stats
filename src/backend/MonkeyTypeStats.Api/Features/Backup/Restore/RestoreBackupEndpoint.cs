@@ -1,4 +1,5 @@
 using MediatR;
+using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Common;
 using HttpResults = Microsoft.AspNetCore.Http.Results;
 
@@ -30,7 +31,7 @@ public static class RestoreBackupEndpoint
             .DisableAntiforgery()
             .Accepts<IFormFile>("multipart/form-data")
             .WithName("RestoreBackup")
-            .RequireAuthorization("ApiKey");
+            .RequireAuthorization(AuthPolicies.Admin);
 
         return app;
     }

@@ -17,6 +17,13 @@ var db = postgres.AddDatabase("monkeytype-stats-db");
 
 var apeKey = builder.AddParameter("monkeytype-ape-key", secret: true);
 var apiKey = builder.AddParameter("monkeytype-stats-api-key", secret: true);
+var adminEmail = builder.AddParameter("monkeytype-stats-admin-email");
+var adminPassword = builder.AddParameter("monkeytype-stats-admin-password", secret: true);
+var authDisabled = builder.AddParameter(
+    "monkeytype-stats-auth-disabled",
+    "false",
+    publishValueAsDefault: true
+);
 
 var api = builder
     .AddProject<Projects.MonkeyTypeStats_Api>("monkeytype-stats-api")
@@ -25,6 +32,9 @@ var api = builder
     .WithEnvironment("MonkeyTypeApi__BaseUrl", "https://api.monkeytype.com")
     .WithEnvironment("MonkeyTypeApi__ApeKey", apeKey)
     .WithEnvironment("MonkeyTypeStatsApiKey", apiKey)
+    .WithEnvironment("Admin__Email", adminEmail)
+    .WithEnvironment("Admin__Password", adminPassword)
+    .WithEnvironment("Auth__Disabled", authDisabled)
     .WithRemoteImageTag("0.2.2");
 
 var frontend = builder
