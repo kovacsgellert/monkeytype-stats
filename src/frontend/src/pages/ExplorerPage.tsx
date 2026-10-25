@@ -46,8 +46,8 @@ export function ExplorerPage() {
   const profileQuery = useProfile();
   const savedViewsQuery = useSavedViews();
   const savedViewMutations = useSavedViewMutations();
-  const [selectedResult, setSelectedResult] = useState<Result | null>(null);
-  const resultDetailsQuery = useResultDetails(selectedResult?.id ?? null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const resultDetailsQuery = useResultDetails(selectedId);
 
   const filter = useMemo(() => sanitizeFilter(search as Record<string, unknown>), [search]);
   const tags = profileQuery.data?.tags ?? [];
@@ -95,6 +95,15 @@ export function ExplorerPage() {
       hours: totalHours(filtered),
     };
   }, [perf, filtered]);
+
+  // previous/next step through the filtered tests by date
+  const selectedIndex = selectedId === null ? -1 : filtered.findIndex((r) => r.id === selectedId);
+  const selectedResult = selectedIndex >= 0 ? filtered[selectedIndex] : null;
+  const closeDetails = useCallback(() => setSelectedId(null), []);
+  const olderId = selectedIndex > 0 ? filtered[selectedIndex - 1].id : null;
+  const newerId = selectedIndex >= 0 && selectedIndex < filtered.length - 1 ? filtered[selectedIndex + 1].id : null;
+  const showOlder = useMemo(() => (olderId ? () => setSelectedId(olderId) : null), [olderId]);
+  const showNewer = useMemo(() => (newerId ? () => setSelectedId(newerId) : null), [newerId]);
 
   const handleSaveView = () => {
     if (isEmptyFilter(filter)) {
@@ -272,7 +281,7 @@ export function ExplorerPage() {
               <ResultsTable
                 key={filterKey(filter)}
                 results={tableResults}
-                onSelectResult={setSelectedResult}
+                onSelectResult={(r) => setSelectedId(r.id)}
               />
             </>
           )}
@@ -281,6 +290,10 @@ export function ExplorerPage() {
 
       {selectedResult ? (
         <ResultDetailsModal
+          result={selectedResult}
+          results={results}
+          onPrevious={showOlder}
+          onNext={showNewer}
           details={resultDetailsQuery.data?.data ?? null}
           isLoading={resultDetailsQuery.isLoading}
           error={
@@ -292,7 +305,7 @@ export function ExplorerPage() {
                 ? (resultDetailsQuery.data.errors[0] ?? "Failed to load result details.")
                 : null
           }
-          onClose={() => setSelectedResult(null)}
+          onClose={closeDetails}
         />
       ) : null}
     </div>

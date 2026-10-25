@@ -5,6 +5,7 @@ import { applyFilter, describeFilter, sanitizeFilter } from "./filter";
 import { computeGoalProgress } from "./goals";
 import { computeInsights } from "./insights";
 import { isPerformance, normalizeResults } from "./normalize";
+import { analyzePace, resultContext } from "./resultAnalysis";
 import { splitSessions } from "./sessions";
 import { rawResult, result, series } from "./testUtils";
 import { cohortKey, detectTracks } from "./tracks";
@@ -106,6 +107,33 @@ describe("insights", () => {
     const accuracy = insights.find((i) => i.id === "accuracy");
     expect(accuracy?.title).toContain("75.0 WPM");
     expect(accuracy?.title).toContain("15.0 faster");
+  });
+});
+
+describe("result analysis", () => {
+  it("ranks a test against tests with the same settings only", () => {
+    const track = series(10, (i) => 50 + i); // 50..59
+    const other = series(5, () => 90, { mode2: "15" });
+    const test = track[7]; // 57
+    const context = resultContext(test, [...track, ...other]);
+    expect(context.cohortSize).toBe(10);
+    expect(context.rank).toBe(3);
+    expect(context.fasterThanPercent).toBeCloseTo((7 / 9) * 100);
+    expect(context.bestAtTheTime).toBe(true);
+  });
+
+  it("summarizes pace and errors from the per-second arrays", () => {
+    const pace = analyzePace([80, 70, 60, 50], [0, 2, 0, 1]);
+    expect(pace).toMatchObject({
+      firstHalf: 75,
+      secondHalf: 55,
+      peakBurst: { value: 80, second: 1 },
+      totalErrors: 3,
+      secondsWithErrors: 2,
+      worstSecond: { second: 2, errors: 2 },
+      longestCleanStreak: 1,
+    });
+    expect(analyzePace(null, null)).toBeNull();
   });
 });
 

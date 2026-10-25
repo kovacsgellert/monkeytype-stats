@@ -153,6 +153,9 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
         <table className="w-full min-w-[720px]">
           <thead>
             <tr className="border-b border-zinc-800/80">
+              <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">
+                Details
+              </th>
               <SortableHeader
                 label="WPM"
                 column="wpm"
@@ -190,9 +193,6 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
                 direction={sortDirection}
                 onSort={handleSort}
               />
-              <th className="px-3 sm:px-6 py-4 text-right text-xs font-medium uppercase tracking-wider text-zinc-500">
-                Details
-              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800/50">
@@ -204,6 +204,28 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
                   animationDelay: `${index * 30}ms`,
                 }}
               >
+                <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                  <button
+                    onClick={() => onSelectResult?.(result)}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 transition hover:bg-cyan-500/20 hover:text-cyan-200"
+                    aria-label="View result details"
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"
+                      />
+                      <circle cx="12" cy="12" r="3" strokeWidth={2} />
+                    </svg>
+                  </button>
+                </td>
                 <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <span
                     className={`font-mono text-lg font-bold ${getWpmColor(result.wpm)}`}
@@ -251,28 +273,6 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
                   <span className="text-sm text-zinc-500">
                     {formatDate(result.timestamp)}
                   </span>
-                </td>
-                <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right">
-                  <button
-                    onClick={() => onSelectResult?.(result)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 transition hover:bg-cyan-500/20 hover:text-cyan-200"
-                    aria-label="View result details"
-                  >
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"
-                      />
-                      <circle cx="12" cy="12" r="3" strokeWidth={2} />
-                    </svg>
-                  </button>
                 </td>
               </tr>
             ))}
