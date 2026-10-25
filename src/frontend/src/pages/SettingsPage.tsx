@@ -37,7 +37,7 @@ export function SettingsPage() {
     onSuccess: (data) => {
       setRestoreSuccess("Backup restored successfully.");
       setRestoreDetails(
-        `Results: ${data.resultsAdded} added / ${data.resultsSkipped} skipped. Details: ${data.resultDetailsAdded} added / ${data.resultDetailsSkipped} skipped. Logs: ${data.monkeyTypeApiResponseLogAdded} added / ${data.monkeyTypeApiResponseLogSkipped} skipped.`,
+        `Results: ${data.resultsAdded} added / ${data.resultsSkipped} skipped. Details: ${data.resultDetailsAdded} added / ${data.resultDetailsSkipped} skipped. Logs: ${data.monkeyTypeApiResponseLogAdded} added / ${data.monkeyTypeApiResponseLogSkipped} skipped. Profile data: ${data.profileRecordsAdded} added.`,
       );
       setSelectedBackupFile(null);
       if (fileInputRef.current) {

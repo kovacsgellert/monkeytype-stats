@@ -34,6 +34,19 @@ public class CreateBackupCommandHandler(
             MonkeyTypeApiResponseLog = await dbContext
                 .MonkeyTypeApiResponseLog.AsNoTracking()
                 .ToListAsync(cancellationToken),
+            ProfileSnapshots = await dbContext
+                .ProfileSnapshots.AsNoTracking()
+                .ToListAsync(cancellationToken),
+            LeaderboardSnapshots = await dbContext
+                .LeaderboardSnapshots.AsNoTracking()
+                .ToListAsync(cancellationToken),
+            SpeedHistogramSnapshots = await dbContext
+                .SpeedHistogramSnapshots.AsNoTracking()
+                .ToListAsync(cancellationToken),
+            PersonalBests = await dbContext
+                .PersonalBests.AsNoTracking()
+                .ToListAsync(cancellationToken),
+            Tags = await dbContext.Tags.AsNoTracking().ToListAsync(cancellationToken),
         };
 
         var json = JsonSerializer.Serialize(backup, jsonOptions);

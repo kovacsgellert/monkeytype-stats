@@ -13,6 +13,7 @@ export type RestoreBackupResult = {
   resultDetailsSkipped: number;
   monkeyTypeApiResponseLogAdded: number;
   monkeyTypeApiResponseLogSkipped: number;
+  profileRecordsAdded: number;
 };
 
 const API_BASE = "/api";

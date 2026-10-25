@@ -4,6 +4,7 @@ using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Data;
 using MonkeyTypeStats.Api.Features.Backup.Create;
 using MonkeyTypeStats.Api.Features.Backup.Restore;
+using MonkeyTypeStats.Api.Features.Profile.Import;
 using MonkeyTypeStats.Api.Features.Results.Get;
 using MonkeyTypeStats.Api.Features.Results.GetById;
 using MonkeyTypeStats.Api.Features.Results.Import;
@@ -73,6 +74,7 @@ builder.Services.AddHangfireServer();
 
 builder.Services.AddScoped<ImportResultsJob>();
 builder.Services.AddScoped<ImportResultDetailsJob>();
+builder.Services.AddScoped<ImportMonkeyTypeProfileJob>();
 builder.Services.AddSingleton<AppVersionProvider>();
 
 var app = builder.Build();
@@ -106,6 +108,12 @@ recurringJobManager.AddOrUpdate<ImportResultDetailsJob>(
     "import-monkeytype-result-details",
     job => job.ExecuteAsync(),
     Cron.Hourly
+);
+
+recurringJobManager.AddOrUpdate<ImportMonkeyTypeProfileJob>(
+    "import-monkeytype-profile",
+    job => job.ExecuteAsync(),
+    Cron.Daily
 );
 
 app.MapGetResultsEndpoint();
