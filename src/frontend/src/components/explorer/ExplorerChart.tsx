@@ -245,11 +245,11 @@ export function ExplorerChart({ results, metric, xAxis, windows, showPbs, showTr
             Avg {window}
           </Pill>
         ))}
-        <Pill active={showPbs} onClick={() => onChange({ pb: !showPbs })} title="Mark every test that set a new best in this view">
-          New bests
-        </Pill>
         <Pill active={showTrend} onClick={() => onChange({ trend: !showTrend })}>
           Trend line
+        </Pill>
+        <Pill active={showPbs} onClick={() => onChange({ pb: !showPbs })} title="Mark every test that set a new best in this view">
+          New bests
         </Pill>
       </div>
     </section>
