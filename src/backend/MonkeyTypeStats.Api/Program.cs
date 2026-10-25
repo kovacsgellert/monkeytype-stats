@@ -61,6 +61,7 @@ builder.AddImportResultsRateLimiter();
 builder.AddNpgsqlDbContext<MonkeyTypeStatsDbContext>("monkeytype-stats-db");
 
 builder.Services.AddScoped<DbMigrator>();
+builder.Services.AddScoped<MonkeyTypeApiResponseLogger>();
 
 builder.Services.AddHangfire(config =>
     config

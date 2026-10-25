@@ -8,16 +8,19 @@ namespace MonkeyTypeStats.Api.Features.Results.Import;
 public class ImportResultsJob
 {
     private readonly MonkeyTypeApiClient _monkeyTypeApiClient;
+    private readonly MonkeyTypeApiResponseLogger _responseLogger;
     private readonly MonkeyTypeStatsDbContext _dbContext;
     private readonly ILogger<ImportResultsJob> _logger;
 
     public ImportResultsJob(
         MonkeyTypeApiClient monkeyTypeApiClient,
+        MonkeyTypeApiResponseLogger responseLogger,
         MonkeyTypeStatsDbContext dbContext,
         ILogger<ImportResultsJob> logger
     )
     {
         _monkeyTypeApiClient = monkeyTypeApiClient;
+        _responseLogger = responseLogger;
         _dbContext = dbContext;
         _logger = logger;
     }
@@ -39,14 +42,6 @@ public class ImportResultsJob
         try
         {
             var response = await _monkeyTypeApiClient.GetResultsAsync();
-
-            var responseLog = new MonkeyTypeApiResponseLog
-            {
-                Id = Guid.NewGuid(),
-                Timestamp = DateTime.UtcNow,
-                Endpoint = "/results",
-                Data = response.RawResponse,
-            };
 
             var resultsData = response.ParsedResponse.Data;
             if (resultsData is null || resultsData.Count == 0)
@@ -77,13 +72,13 @@ public class ImportResultsJob
 
             _logger.LogInformation("Adding {Count} new results to database", newResults.Count);
 
-            _dbContext.MonkeyTypeApiResponseLog.Add(responseLog);
+            // only responses that bring new results are worth keeping in the history
+            await _responseLogger.AddIfChangedAsync("/results", response.RawResponse);
             _dbContext.Results.AddRange(newResults);
             await _dbContext.SaveChangesAsync();
 
             _logger.LogInformation(
-                "Successfully imported MonkeyType results. ResponseLog ID: {LogId}, New results: {NewCount}, Skipped duplicates: {SkippedCount}",
-                responseLog.Id,
+                "Successfully imported MonkeyType results. New results: {NewCount}, Skipped duplicates: {SkippedCount}",
                 newResults.Count,
                 existingResultIds.Count
             );

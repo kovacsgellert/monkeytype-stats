@@ -19,16 +19,19 @@ public class ImportMonkeyTypeProfileJob
     private static readonly string[] PersonalBestModes = ["time", "words"];
 
     private readonly MonkeyTypeApiClient _monkeyTypeApiClient;
+    private readonly MonkeyTypeApiResponseLogger _responseLogger;
     private readonly MonkeyTypeStatsDbContext _dbContext;
     private readonly ILogger<ImportMonkeyTypeProfileJob> _logger;
 
     public ImportMonkeyTypeProfileJob(
         MonkeyTypeApiClient monkeyTypeApiClient,
+        MonkeyTypeApiResponseLogger responseLogger,
         MonkeyTypeStatsDbContext dbContext,
         ILogger<ImportMonkeyTypeProfileJob> logger
     )
     {
         _monkeyTypeApiClient = monkeyTypeApiClient;
+        _responseLogger = responseLogger;
         _dbContext = dbContext;
         _logger = logger;
     }
@@ -67,10 +70,10 @@ public class ImportMonkeyTypeProfileJob
     private async Task ImportProfileSnapshotAsync(DateTime capturedAt)
     {
         var statsResponse = await _monkeyTypeApiClient.GetUserStatsAsync();
-        LogResponse(statsResponse);
+        await LogResponseAsync(statsResponse);
 
         var streakResponse = await _monkeyTypeApiClient.GetStreakAsync();
-        LogResponse(streakResponse);
+        await LogResponseAsync(streakResponse);
 
         var stats = statsResponse.ParsedResponse.Data;
         var streak = streakResponse.ParsedResponse.Data;
@@ -108,7 +111,7 @@ public class ImportMonkeyTypeProfileJob
                     mode,
                     mode2
                 );
-                LogResponse(rankResponse);
+                await LogResponseAsync(rankResponse);
                 rank = rankResponse.ParsedResponse.Data;
             }
             catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -126,7 +129,7 @@ public class ImportMonkeyTypeProfileJob
                 mode,
                 mode2
             );
-            // the raw leaderboard page holds other users' data, so only its size is kept
+            await LogResponseAsync(leaderboardResponse);
 
             _dbContext.LeaderboardSnapshots.Add(
                 new LeaderboardSnapshot
@@ -152,7 +155,7 @@ public class ImportMonkeyTypeProfileJob
                 mode,
                 mode2
             );
-            LogResponse(histogramResponse);
+            await LogResponseAsync(histogramResponse);
 
             var histogram = histogramResponse.ParsedResponse.Data;
             if (histogram is null)
@@ -187,7 +190,7 @@ public class ImportMonkeyTypeProfileJob
         foreach (var mode in PersonalBestModes)
         {
             var response = await _monkeyTypeApiClient.GetPersonalBestsAsync(mode);
-            LogResponse(response);
+            await LogResponseAsync(response);
 
             var data = response.ParsedResponse.Data;
             if (data is null)
@@ -229,7 +232,7 @@ public class ImportMonkeyTypeProfileJob
     private async Task ImportTagsAsync()
     {
         var response = await _monkeyTypeApiClient.GetTagsAsync();
-        LogResponse(response);
+        await LogResponseAsync(response);
 
         var tags = response.ParsedResponse.Data;
         if (tags is null)
@@ -254,18 +257,8 @@ public class ImportMonkeyTypeProfileJob
         );
     }
 
-    private void LogResponse<T>(MonkeyTypeApiCallResult<T> response)
-    {
-        _dbContext.MonkeyTypeApiResponseLog.Add(
-            new MonkeyTypeApiResponseLog
-            {
-                Id = Guid.NewGuid(),
-                Timestamp = DateTime.UtcNow,
-                Endpoint = response.Endpoint,
-                Data = response.RawResponse,
-            }
-        );
-    }
+    private Task LogResponseAsync<T>(MonkeyTypeApiCallResult<T> response) =>
+        _responseLogger.AddIfChangedAsync(response.Endpoint, response.RawResponse);
 
     private static DateTime? ToDateTime(long? unixMilliseconds) =>
         unixMilliseconds is null

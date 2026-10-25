@@ -11,16 +11,19 @@ public class ImportResultDetailsJob
     private const int MaxApiCallsPerRun = 20;
 
     private readonly MonkeyTypeApiClient _monkeyTypeApiClient;
+    private readonly MonkeyTypeApiResponseLogger _responseLogger;
     private readonly MonkeyTypeStatsDbContext _dbContext;
     private readonly ILogger<ImportResultDetailsJob> _logger;
 
     public ImportResultDetailsJob(
         MonkeyTypeApiClient monkeyTypeApiClient,
+        MonkeyTypeApiResponseLogger responseLogger,
         MonkeyTypeStatsDbContext dbContext,
         ILogger<ImportResultDetailsJob> logger
     )
     {
         _monkeyTypeApiClient = monkeyTypeApiClient;
+        _responseLogger = responseLogger;
         _dbContext = dbContext;
         _logger = logger;
     }
@@ -62,15 +65,10 @@ public class ImportResultDetailsJob
 
                 var response = await _monkeyTypeApiClient.GetResultByIdAsync(result.Id);
 
-                var responseLog = new MonkeyTypeApiResponseLog
-                {
-                    Id = Guid.NewGuid(),
-                    Timestamp = DateTime.UtcNow,
-                    Endpoint = $"/results/id/{result.Id}",
-                    Data = response.RawResponse,
-                };
-
-                _dbContext.MonkeyTypeApiResponseLog.Add(responseLog);
+                await _responseLogger.AddIfChangedAsync(
+                    $"/results/id/{result.Id}",
+                    response.RawResponse
+                );
 
                 var details = response.ParsedResponse.Data;
                 if (details is null)
