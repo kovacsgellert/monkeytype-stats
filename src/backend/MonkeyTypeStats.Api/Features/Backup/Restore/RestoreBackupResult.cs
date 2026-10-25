@@ -7,5 +7,7 @@ public record RestoreBackupResult(
     int ResultDetailsSkipped,
     int MonkeyTypeApiResponseLogAdded,
     int MonkeyTypeApiResponseLogSkipped,
-    int ProfileRecordsAdded
+    int ProfileRecordsAdded,
+    int SavedViewsAdded,
+    int GoalsAdded
 );

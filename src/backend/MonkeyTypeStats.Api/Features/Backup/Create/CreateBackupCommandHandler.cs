@@ -47,6 +47,8 @@ public class CreateBackupCommandHandler(
                 .PersonalBests.AsNoTracking()
                 .ToListAsync(cancellationToken),
             Tags = await dbContext.Tags.AsNoTracking().ToListAsync(cancellationToken),
+            SavedViews = await dbContext.SavedViews.AsNoTracking().ToListAsync(cancellationToken),
+            Goals = await dbContext.Goals.AsNoTracking().ToListAsync(cancellationToken),
         };
 
         var json = JsonSerializer.Serialize(backup, jsonOptions);

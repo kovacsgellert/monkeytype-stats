@@ -24,6 +24,10 @@ public class MonkeyTypeStatsDbContext : DbContext
 
     public DbSet<Tag> Tags => Set<Tag>();
 
+    public DbSet<SavedView> SavedViews => Set<SavedView>();
+
+    public DbSet<Goal> Goals => Set<Goal>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<MonkeyTypeApiResponseLog>(entity =>
@@ -160,6 +164,26 @@ public class MonkeyTypeStatsDbContext : DbContext
             entity.Property(e => e.Id).HasMaxLength(50);
 
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<SavedView>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+
+            entity.Property(e => e.Filter).IsRequired().HasColumnType("jsonb");
+        });
+
+        modelBuilder.Entity<Goal>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Type).IsRequired().HasMaxLength(50);
+
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(100);
+
+            entity.Property(e => e.Filter).HasColumnType("jsonb");
         });
     }
 }

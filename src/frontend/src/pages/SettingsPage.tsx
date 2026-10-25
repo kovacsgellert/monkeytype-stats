@@ -37,7 +37,7 @@ export function SettingsPage() {
     onSuccess: (data) => {
       setRestoreSuccess("Backup restored successfully.");
       setRestoreDetails(
-        `Results: ${data.resultsAdded} added / ${data.resultsSkipped} skipped. Details: ${data.resultDetailsAdded} added / ${data.resultDetailsSkipped} skipped. Logs: ${data.monkeyTypeApiResponseLogAdded} added / ${data.monkeyTypeApiResponseLogSkipped} skipped. Profile data: ${data.profileRecordsAdded} added.`,
+        `Results: ${data.resultsAdded} added / ${data.resultsSkipped} skipped. Details: ${data.resultDetailsAdded} added / ${data.resultDetailsSkipped} skipped. Logs: ${data.monkeyTypeApiResponseLogAdded} added / ${data.monkeyTypeApiResponseLogSkipped} skipped. Profile data: ${data.profileRecordsAdded} added. Saved views: ${data.savedViewsAdded} added. Goals: ${data.goalsAdded} added.`,
       );
       setSelectedBackupFile(null);
       if (fileInputRef.current) {
@@ -49,7 +49,9 @@ export function SettingsPage() {
   const importResultsMutation = useMutation({
     mutationFn: (apiKey: string) => importResults(apiKey),
     onSuccess: (data) => {
-      setImportMessage(`Import complete. Added ${data.resultsAdded} results.`);
+      setImportMessage(
+        `Import complete. Added ${data.resultsAdded} results.${data.profileImported ? " Profile data updated." : " Profile data could not be updated."}`,
+      );
     },
   });
 

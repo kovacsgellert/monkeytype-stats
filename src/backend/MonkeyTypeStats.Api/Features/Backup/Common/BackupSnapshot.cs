@@ -13,4 +13,6 @@ public sealed class BackupSnapshot
     public List<SpeedHistogramSnapshot> SpeedHistogramSnapshots { get; set; } = [];
     public List<PersonalBest> PersonalBests { get; set; } = [];
     public List<Tag> Tags { get; set; } = [];
+    public List<SavedView> SavedViews { get; set; } = [];
+    public List<Goal> Goals { get; set; } = [];
 }

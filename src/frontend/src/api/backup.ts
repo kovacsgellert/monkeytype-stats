@@ -14,6 +14,8 @@ export type RestoreBackupResult = {
   monkeyTypeApiResponseLogAdded: number;
   monkeyTypeApiResponseLogSkipped: number;
   profileRecordsAdded: number;
+  savedViewsAdded: number;
+  goalsAdded: number;
 };
 
 const API_BASE = "/api";

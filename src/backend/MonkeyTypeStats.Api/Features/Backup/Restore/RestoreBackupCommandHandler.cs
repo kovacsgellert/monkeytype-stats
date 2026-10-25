@@ -150,6 +150,19 @@ public class RestoreBackupCommandHandler(MonkeyTypeStatsDbContext dbContext)
             profileRecordsAdded += personalBestsToAdd.Count;
         }
 
+        var savedViewsAdded = await AddMissingAsync(
+            dbContext.SavedViews,
+            backup.SavedViews,
+            e => e.Id,
+            cancellationToken
+        );
+        var goalsAdded = await AddMissingAsync(
+            dbContext.Goals,
+            backup.Goals,
+            e => e.Id,
+            cancellationToken
+        );
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return OperationResult<RestoreBackupResult>.Ok(
@@ -160,7 +173,9 @@ public class RestoreBackupCommandHandler(MonkeyTypeStatsDbContext dbContext)
                 distinctResultDetails.Count - newResultDetails.Count,
                 newResponseLogs.Count,
                 distinctResponseLogs.Count - newResponseLogs.Count,
-                profileRecordsAdded
+                profileRecordsAdded,
+                savedViewsAdded,
+                goalsAdded
             )
         );
     }

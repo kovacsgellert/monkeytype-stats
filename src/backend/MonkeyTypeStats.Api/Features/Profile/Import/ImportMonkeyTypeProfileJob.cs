@@ -38,6 +38,16 @@ public class ImportMonkeyTypeProfileJob
 
     public async Task ExecuteAsync()
     {
+        await ExecuteInternalAsync();
+    }
+
+    public Task<bool> ExecuteWithResultAsync()
+    {
+        return ExecuteInternalAsync();
+    }
+
+    private async Task<bool> ExecuteInternalAsync()
+    {
         _logger.LogInformation("Starting daily MonkeyType profile import job");
 
         try
@@ -52,6 +62,7 @@ public class ImportMonkeyTypeProfileJob
             await _dbContext.SaveChangesAsync();
 
             _logger.LogInformation("Successfully imported MonkeyType profile data");
+            return true;
         }
         catch (HttpRequestException ex) when (ex.StatusCode == (HttpStatusCode)479)
         {
@@ -59,6 +70,7 @@ public class ImportMonkeyTypeProfileJob
                 ex,
                 "MonkeyType API rate limit exceeded (status code 479). Stopping profile import job."
             );
+            return false;
         }
         catch (Exception ex)
         {
