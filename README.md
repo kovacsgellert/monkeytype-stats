@@ -95,3 +95,5 @@ I'm a backend guy with mainly .NET experience, so at the time of writing, my kno
 ### Result details
 
 ![Result details with per-second chart](screenshots/result-details.png)
+
+More screenshots of every page: [SCREENSHOTS.md](SCREENSHOTS.md)
