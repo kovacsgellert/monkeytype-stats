@@ -1,3 +1,6 @@
+import { currentDateSettings } from "../utils/datePreferences";
+import { formatMonthYear, weekdayNames, weekdayPosition, type WeekStart } from "../utils/dates";
+import { formatDate } from "../utils/format";
 import { formatLanguage } from "../utils/languageUtils";
 import type { TestResult } from "./normalize";
 
@@ -23,7 +26,6 @@ export const dimensions: { key: Dimension; label: string }[] = [
   { key: "accuracy", label: "Accuracy band" },
 ];
 
-const weekdayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export const accuracyBands = [
   { key: "a0", label: "< 92%", min: 0, max: 92 },
@@ -37,9 +39,10 @@ function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
-function isoWeekStart(date: Date): Date {
+/** First day of the week the date falls in, using the first weekday chosen in Settings. */
+function weekStartOf(date: Date, weekStart: WeekStart): Date {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  d.setDate(d.getDate() - weekdayPosition(d.getDay(), weekStart));
   return d;
 }
 
@@ -57,11 +60,12 @@ export function dimensionKey(
     case "month":
       return `${r.date.getFullYear()}-${pad(r.date.getMonth() + 1)}`;
     case "week": {
-      const d = isoWeekStart(r.date);
+      const d = weekStartOf(r.date, currentDateSettings().weekStart);
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     }
     case "weekday":
-      return String((r.date.getDay() + 6) % 7);
+      // position within the week, so weekdays sort from the first day of the week
+      return String(weekdayPosition(r.date.getDay(), currentDateSettings().weekStart));
     case "hour":
       return pad(r.date.getHours());
     case "session":
@@ -79,12 +83,12 @@ export function dimensionLabel(dimension: Dimension, key: string): string {
   switch (dimension) {
     case "month": {
       const [y, m] = key.split("-").map(Number);
-      return new Date(y, m - 1, 1).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+      return formatMonthYear(new Date(y, m - 1, 1), currentDateSettings().dateOrder);
     }
     case "week":
-      return `Week of ${new Date(key + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+      return `Week of ${formatDate(new Date(key + "T00:00:00"))}`;
     case "weekday":
-      return weekdayNames[Number(key)];
+      return weekdayNames(currentDateSettings().weekStart)[Number(key)].slice(0, 3);
     case "hour":
       return `${key}:00`;
     case "session": {

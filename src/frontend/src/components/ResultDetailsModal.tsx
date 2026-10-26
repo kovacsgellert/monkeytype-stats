@@ -15,7 +15,7 @@ import { testLabel } from "../stats/dimensions";
 import type { TestResult } from "../stats/normalize";
 import { analyzePace, resultContext } from "../stats/resultAnalysis";
 import type { ResultDetails } from "../types/result";
-import { formatNumber, signed } from "../utils/format";
+import { formatDateTime, formatNumber, signed } from "../utils/format";
 import { formatLanguage } from "../utils/languageUtils";
 import { Pill } from "./ui";
 
@@ -185,7 +185,7 @@ export function ResultDetailsModal({
               {settings.join(" · ")}
             </h2>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-zinc-400">
-              <span>{result.date.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}</span>
+              <span>{formatDateTime(result.date)}</span>
               {result.isPb ? <Badge tone="amber">★ Personal best</Badge> : null}
               {!result.isPb && context.bestAtTheTime ? <Badge tone="emerald">Best in this setting at the time</Badge> : null}
               {result.bailedOut ? <Badge tone="zinc">Bailed out</Badge> : null}

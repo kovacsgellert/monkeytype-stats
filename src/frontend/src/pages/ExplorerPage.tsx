@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { BreakdownTable } from "../components/explorer/BreakdownTable";
 import { ExplorerChart } from "../components/explorer/ExplorerChart";
 import { FilterBar } from "../components/explorer/FilterBar";
-import { LoadingSkeleton } from "../components/LoadingSkeleton";
+import { ExplorerSkeleton } from "../components/LoadingSkeleton";
 import { ResultDetailsModal } from "../components/ResultDetailsModal";
 import { ResultsTable } from "../components/ResultsTable";
 import { EmptyState, StatTile } from "../components/ui";
@@ -115,7 +115,7 @@ export function ExplorerPage() {
   const mutationError =
     savedViewMutations.create.error ?? savedViewMutations.remove.error ?? null;
 
-  if (query.isLoading) return <LoadingSkeleton />;
+  if (query.isLoading) return <ExplorerSkeleton />;
   if (query.isError)
     return (
       <EmptyState title="Failed to load results">

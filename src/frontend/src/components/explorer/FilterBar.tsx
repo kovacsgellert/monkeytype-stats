@@ -4,8 +4,11 @@ import type { SavedView } from "../../api/savedViews";
 import { describeFilter, isEmptyFilter, periodPresets, timesOfDay, type ResultFilter } from "../../stats/filter";
 import type { TestResult } from "../../stats/normalize";
 import type { Track } from "../../stats/tracks";
+import { useDatePreferences } from "../../hooks/useDatePreferences";
+import { formatIsoDate } from "../../utils/dates";
 import { formatLanguage } from "../../utils/languageUtils";
-import { inputClass, Pill } from "../ui";
+import { DatePicker } from "../DatePicker";
+import { Pill } from "../ui";
 
 interface FilterBarProps {
   results: TestResult[];
@@ -146,11 +149,12 @@ export function FilterBar({
     setOpen(null);
   };
 
+  const { dateOrder } = useDatePreferences();
   const tagName = (id: string) => tags.find((t) => t.id === id)?.name ?? id;
   const periodLabel = filter.period
     ? (periodPresets.find((p) => p.key === filter.period)?.label ?? filter.period)
     : filter.from || filter.to
-      ? `${filter.from ?? "…"} – ${filter.to ?? "…"}`
+      ? `${filter.from ? formatIsoDate(filter.from, dateOrder) : "…"} – ${filter.to ? formatIsoDate(filter.to, dateOrder) : "…"}`
       : undefined;
   const moreCount = [filter.punctuation, filter.numbers, filter.timeOfDay, filter.tag, filter.includeBailed].filter(
     (v) => v !== undefined,
@@ -190,20 +194,20 @@ export function FilterBar({
           <div className="grid grid-cols-2 gap-2">
             <label className="text-xs text-zinc-400">
               From
-              <input
-                type="date"
+              <DatePicker
                 value={filter.period ? "" : (filter.from ?? "")}
-                onChange={(e) => onChange({ period: undefined, from: e.target.value || undefined })}
-                className={`${inputClass} mt-1`}
+                onChange={(value) => onChange({ period: undefined, from: value || undefined })}
+                align="left"
+                className="mt-1"
               />
             </label>
             <label className="text-xs text-zinc-400">
               To
-              <input
-                type="date"
+              <DatePicker
                 value={filter.period ? "" : (filter.to ?? "")}
-                onChange={(e) => onChange({ period: undefined, to: e.target.value || undefined })}
-                className={`${inputClass} mt-1`}
+                onChange={(value) => onChange({ period: undefined, to: value || undefined })}
+                align="right"
+                className="mt-1"
               />
             </label>
           </div>

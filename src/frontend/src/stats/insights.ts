@@ -1,3 +1,4 @@
+import { formatDate } from "../utils/format";
 import { formatLanguage } from "../utils/languageUtils";
 import { groupStats, mean, type GroupStats } from "./aggregate";
 import { accuracyBands, dimensionKey, dimensionLabel, type Dimension } from "./dimensions";
@@ -337,7 +338,7 @@ function breakRecoveryInsight(tracks: Track[]): Insight | null {
     title: rusty
       ? `After your ${recovery.gapDays}-day break you came back ${fmt(-diff)} WPM slower — expect a few rusty tests.`
       : `Breaks don't seem to hurt you: after a ${recovery.gapDays}-day break your first 5 tests averaged ${fmt(recovery.after)} WPM, against ${fmt(recovery.before)} before.`,
-    body: `${recovery.track.name}, break ending ${recovery.returnedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}. Last 20 tests before vs first 5 after.`,
+    body: `${recovery.track.name}, break ending ${formatDate(recovery.returnedAt)}. Last 20 tests before vs first 5 after.`,
     sample: `${recovery.gapDays} days off`,
     score: 3,
     link: { label: "See that track", filter: recovery.track.filter },
@@ -369,7 +370,7 @@ function milestones(perf: TestResult[]): Insight | null {
     if (first)
       facts.push({
         label: `First ${threshold}+ WPM`,
-        value: first.date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        value: formatDate(first.date),
       });
   }
   if (facts.length === 0) return null;
