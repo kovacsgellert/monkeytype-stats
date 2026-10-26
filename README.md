@@ -25,7 +25,7 @@ The main goals of this project are:
 ## Features
 
 - Scheduled job that runs once every day and imports all new results from the MonkeyType API with ApeKey authentication.
-  - The job can also be triggered manually from the Settings page (endpoint protected with ApiKey auth).
+  - The job can also be triggered manually from the Settings page (admin only).
 - Scheduled job that runs hourly and fetches missing result details (needed for wpm/burst/error charts on the test level).
 - Activity heatmap (similar to the one on MonkeyType Account page).
 - Filtering results by Timestamp, Mode (including Mode2), Language.
@@ -33,7 +33,7 @@ The main goals of this project are:
 - Table view showing the list of all/filtered results.
 - Graph view showing speed/accuracy/consistency evolution over time (including rolling averages of latest 10 and 100 results).
 - Graph view showing wpm/burst/error on the test level (accessible through the Details column of the table view).
-- JSON backup/restore of the database (endpoints protected with ApiKey auth).
+- JSON backup/restore of the database (admin only).
 
 ### Planned
 
@@ -45,7 +45,7 @@ The main goals of this project are:
 2. Use the example [docker-compose.yaml](compose/docker-compose.yaml) and [.env.example](compose/.env.example) files to deploy the application to you homelab.
 
 Before deployment adjust the image versions in the docker-compose.yaml to use the latest images and set up the variables in the .env file.
-The buttons on the Settings page are protected with ApiKey auth, you will be prompted to input the ApiKey that you defined as the MONKEYTYPE_STATS_API_KEY env var.
+Changing data (goals, saved views, imports, backups) requires logging in as the admin, and the Settings page is only visible once you're logged in. The API key from MONKEYTYPE_STATS_API_KEY still works for scripts and the Bruno collection.
 
 ### Admin login
 

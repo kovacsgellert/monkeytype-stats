@@ -10,6 +10,7 @@ import { EmptyState, StatTile } from "../components/ui";
 import { formatDate, formatNumber, signed } from "../utils/format";
 import { useProfile } from "../hooks/useProfile";
 import { useResultDetails } from "../hooks/useResultDetails";
+import { canWrite, useAuth, useCurrentUser } from "../hooks/useAuth";
 import { useSavedViewMutations, useSavedViews } from "../hooks/useSavedViews";
 import { useTestResults } from "../hooks/useTestResults";
 import type { ExplorerSearch } from "../router";
@@ -39,6 +40,8 @@ export function ExplorerPage() {
   const profileQuery = useProfile();
   const savedViewsQuery = useSavedViews();
   const savedViewMutations = useSavedViewMutations();
+  const { ensureLoggedIn } = useAuth();
+  const currentUser = useCurrentUser();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const resultDetailsQuery = useResultDetails(selectedId);
 
@@ -98,9 +101,14 @@ export function ExplorerPage() {
   const showOlder = useMemo(() => (olderId ? () => setSelectedId(olderId) : null), [olderId]);
   const showNewer = useMemo(() => (newerId ? () => setSelectedId(newerId) : null), [newerId]);
 
-  const handleSaveView = () => {
+  const handleSaveView = async () => {
     if (isEmptyFilter(filter)) {
       window.alert("Pick some filters first — an empty view would just show everything.");
+      return;
+    }
+    try {
+      await ensureLoggedIn("save this view");
+    } catch {
       return;
     }
     const name = window.prompt("Name this view:");
@@ -125,7 +133,9 @@ export function ExplorerPage() {
   if (results.length === 0)
     return (
       <EmptyState title="No results yet">
-        Import your Monkeytype results from the Settings page to get started.
+        {canWrite(currentUser.data)
+          ? "Import your Monkeytype results from the Settings page to get started."
+          : "Results are imported from Monkeytype once a day. Check back after the next import."}
       </EmptyState>
     );
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { MonkeyTypeProfile } from "../../api/profile";
+import { canWrite, useCurrentUser } from "../../hooks/useAuth";
 import { useLeaderboardHistory } from "../../hooks/useProfile";
 import { cardClass, Pill, Sparkline } from "../ui";
 import { formatDate, formatNumber } from "../../utils/format";
@@ -52,6 +53,7 @@ function Histogram({ buckets, wpm }: { buckets: Record<string, number>; wpm: num
 }
 
 export function CommunityStanding({ profile, isLoading, importedTests }: CommunityStandingProps) {
+  const currentUser = useCurrentUser();
   const [mode2, setMode2] = useState("60");
   const historyQuery = useLeaderboardHistory(mode2);
 
@@ -78,7 +80,8 @@ export function CommunityStanding({ profile, isLoading, importedTests }: Communi
 
       {!board ? (
         <p className="text-sm text-zinc-400">
-          Leaderboard data is imported once a day — the first snapshot appears after the next import (or run one from Settings).
+          Leaderboard data is imported once a day — the first snapshot appears after the next import
+          {canWrite(currentUser.data) ? " (or run one from Settings)" : ""}.
         </p>
       ) : (
         <div className="flex flex-wrap gap-6">

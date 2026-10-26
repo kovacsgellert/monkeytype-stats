@@ -4,6 +4,7 @@ import {
   createRouter,
 } from "@tanstack/react-router";
 import App from "./App";
+import { RequireLogin } from "./components/auth/RequireLogin";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ExplorerPage } from "./pages/ExplorerPage";
 import { GoalsPage } from "./pages/GoalsPage";
@@ -68,7 +69,11 @@ const goalsRoute = createRoute({
 const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "settings",
-  component: SettingsPage,
+  component: () => (
+    <RequireLogin>
+      <SettingsPage />
+    </RequireLogin>
+  ),
 });
 
 const routeTree = rootRoute.addChildren([

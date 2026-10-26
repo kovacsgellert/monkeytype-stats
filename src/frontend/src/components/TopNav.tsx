@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import logo from "../assets/monkeytype-stats-logo.png";
+import { canWrite, useCurrentUser } from "../hooks/useAuth";
+import { UserMenu } from "./auth/UserMenu";
 
 type NavItem = {
   to: "/" | "/explorer" | "/goals" | "/settings";
@@ -17,6 +19,12 @@ const navLinkBase =
   "group relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200";
 
 export function TopNav() {
+  const currentUser = useCurrentUser();
+  // Settings only holds admin actions, so it's hidden until the user may change data
+  const visibleItems = canWrite(currentUser.data)
+    ? navItems
+    : navItems.filter((item) => item.to !== "/settings");
+
   return (
     <header className="border-b border-zinc-800/50 backdrop-blur-sm bg-zinc-950/80 sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3 sm:px-6 sm:py-5 sm:gap-6">
@@ -39,8 +47,9 @@ export function TopNav() {
             </div>
           </div>
         </div>
+        <div className="flex items-center gap-2 shrink-0 sm:gap-3">
         <nav className="flex items-center gap-1 sm:gap-2 rounded-full bg-zinc-900/60 border border-zinc-800/80 p-1 shrink-0">
-          {navItems.map((item) => (
+          {visibleItems.map((item) => (
             <Link
               key={item.to}
               to={item.to}
@@ -56,6 +65,8 @@ export function TopNav() {
             </Link>
           ))}
         </nav>
+        <UserMenu />
+        </div>
       </div>
     </header>
   );

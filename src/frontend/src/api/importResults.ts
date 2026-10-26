@@ -1,19 +1,18 @@
 import type { OperationResult } from "../types/operationResult";
-import { createApiKeyAuthHeaders } from "./apiKeyAuth";
+import { UnauthorizedError } from "./apiClient";
 
 export type ImportResultsResponse = {
   resultsAdded: number;
   profileImported: boolean;
 };
 
-export async function importResults(apiKey: string): Promise<ImportResultsResponse> {
+export async function importResults(): Promise<ImportResultsResponse> {
   const response = await fetch(`api/results/import`, {
     method: "POST",
-    headers: createApiKeyAuthHeaders(apiKey),
   });
 
   if (response.status === 401) {
-    throw new Error("Unauthorized");
+    throw new UnauthorizedError();
   }
   let payload: OperationResult<ImportResultsResponse> | null = null;
 
