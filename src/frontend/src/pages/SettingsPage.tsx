@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { createBackup, restoreBackup } from "../api/backup";
 import { importResults } from "../api/importResults";
+import { DisplaySettings } from "../components/DisplaySettings";
 import { useAppVersion } from "../hooks/useAppVersion";
 import { useAuth } from "../hooks/useAuth";
 
@@ -279,6 +280,8 @@ export function SettingsPage() {
           </div>
         </div>
       </section>
+
+      <DisplaySettings />
 
       <section className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-lg shadow-black/20 p-4 sm:p-6 lg:p-8">
         <div>

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { toSaveGoalRequest, type Goal, type SaveGoalRequest } from "../api/goals";
 import { GoalCard } from "../components/goals/GoalCard";
 import { GoalForm } from "../components/goals/GoalForm";
-import { LoadingSkeleton } from "../components/LoadingSkeleton";
+import { GoalsSkeleton } from "../components/LoadingSkeleton";
 import { EmptyState, primaryButtonClass } from "../components/ui";
 import { useAuth } from "../hooks/useAuth";
 import { useGoalMutations } from "../hooks/useGoals";
@@ -52,7 +52,7 @@ export function GoalsPage() {
     />
   );
 
-  if (goalsQuery.isLoading || resultsQuery.isLoading) return <LoadingSkeleton />;
+  if (goalsQuery.isLoading || resultsQuery.isLoading) return <GoalsSkeleton />;
 
   const formError = (editing?.kind === "edit" ? update.error : create.error)?.message ?? null;
   const listError = update.error ?? remove.error;

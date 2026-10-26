@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import type { Result } from "../types/result";
 import { formatLanguage } from "../utils/languageUtils";
+import { formatDateTime } from "../utils/format";
 
 interface ResultsTableProps {
   results: Result[];
@@ -12,16 +13,6 @@ type SortDirection = "asc" | "desc";
 
 const PAGE_SIZE_OPTIONS = [10, 50, 100] as const;
 
-function formatDate(timestamp: string): string {
-  const date = new Date(timestamp);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function getWpmColor(wpm: number): string {
   if (wpm >= 120) return "text-emerald-400";
@@ -271,7 +262,7 @@ export function ResultsTable({ results, onSelectResult }: ResultsTableProps) {
                 </td>
                 <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                   <span className="text-sm text-zinc-500">
-                    {formatDate(result.timestamp)}
+                    {formatDateTime(result.timestamp)}
                   </span>
                 </td>
               </tr>

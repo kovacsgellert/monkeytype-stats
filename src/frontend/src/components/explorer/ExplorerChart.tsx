@@ -13,6 +13,9 @@ import type { ExplorerMetric, ExplorerXAxis } from "../../router";
 import { rollingMean } from "../../stats/aggregate";
 import { testLabel } from "../../stats/dimensions";
 import { recordedSeconds, type TestResult } from "../../stats/normalize";
+import { currentDateSettings } from "../../utils/datePreferences";
+import { formatDay } from "../../utils/dates";
+import { formatDateTime } from "../../utils/format";
 import { formatLanguage } from "../../utils/languageUtils";
 import { Pill } from "../ui";
 
@@ -149,7 +152,7 @@ export function ExplorerChart({ results, metric, xAxis, windows, showPbs, showTr
 
   const formatX = (value: number) => {
     if (xAxis === "date")
-      return new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
+      return formatDay(new Date(value), currentDateSettings().dateOrder, { year: "2-digit" });
     if (xAxis === "hours") return `${value.toFixed(1)} h`;
     return `#${Math.round(value)}`;
   };
@@ -227,7 +230,7 @@ export function ExplorerChart({ results, metric, xAxis, windows, showPbs, showTr
                     // the scatter dataset maps 1:1 to results, so show the test there
                     if (item.datasetIndex === 0) {
                       const r = results[item.dataIndex];
-                      return `${r.date.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })} · ${testLabel(r)} · ${formatLanguage(r.language)}`;
+                      return `${formatDateTime(r.date)} · ${testLabel(r)} · ${formatLanguage(r.language)}`;
                     }
                     return formatX(item.parsed.x ?? 0);
                   },

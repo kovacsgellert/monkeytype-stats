@@ -4,6 +4,7 @@ import type { ResultFilter } from "../../stats/filter";
 import { goalTypes, leaderboardMode2 } from "../../stats/goals";
 import type { Track } from "../../stats/tracks";
 import { formatLanguage } from "../../utils/languageUtils";
+import { DatePicker } from "../DatePicker";
 import { buttonClass, inputClass, primaryButtonClass } from "../ui";
 
 interface GoalFormProps {
@@ -208,7 +209,7 @@ export function GoalForm({ tracks, languages, initial, saving, error, onSave, on
         ) : null}
         <label className={labelClass}>
           Deadline (optional)
-          <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className={inputClass} />
+          <DatePicker value={deadline} onChange={setDeadline} />
         </label>
       </div>
 

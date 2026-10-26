@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Result } from "../types/result";
+import { useDatePreferences } from "../hooks/useDatePreferences";
+import { formatDay, weekdayNames, weekdayPosition, type WeekStart } from "../utils/dates";
 import { formatLanguage } from "../utils/languageUtils";
 
 interface ActivityHeatmapProps {
@@ -43,9 +45,9 @@ function startOfTodayUTC(): Date {
   );
 }
 
-// Monday = 0 ... Sunday = 6
-function mondayIndexUTC(d: Date): number {
-  return (d.getUTCDay() + 6) % 7;
+// 0 = first day of the week ... 6 = last day of the week
+function weekIndexUTC(d: Date, weekStart: WeekStart): number {
+  return weekdayPosition(d.getUTCDay(), weekStart);
 }
 
 function addDaysUTC(d: Date, days: number): Date {
@@ -65,6 +67,7 @@ function getLevel(count: number, max: number): number {
 }
 
 export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
+  const { dateOrder, weekStart } = useDatePreferences();
   const [range, setRange] = useState<RangeKey>("12m");
 
   // Years with actual activity (UTC), newest first.
@@ -120,13 +123,13 @@ export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
       }
     }
 
-    // Align to full Mon-Sun weeks for stable columns.
-    const startMonday = addDaysUTC(windowStart, -mondayIndexUTC(windowStart));
-    const endSunday = addDaysUTC(windowEnd, 6 - mondayIndexUTC(windowEnd));
+    // Align to full weeks, starting on the first day of the week, for stable columns.
+    const firstWeekStart = addDaysUTC(windowStart, -weekIndexUTC(windowStart, weekStart));
+    const lastWeekEnd = addDaysUTC(windowEnd, 6 - weekIndexUTC(windowEnd, weekStart));
 
     const weeks: Date[][] = [];
-    let cursor = startMonday;
-    while (cursor <= endSunday) {
+    let cursor = firstWeekStart;
+    while (cursor <= lastWeekEnd) {
       const week: Date[] = [];
       for (let i = 0; i < 7; i++) {
         week.push(addDaysUTC(cursor, i));
@@ -139,7 +142,7 @@ export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
     for (const c of counts.values()) totalTests += c;
 
     return { weeks, counts, byDay, totalTests };
-  }, [results, range]);
+  }, [results, range, weekStart]);
 
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
@@ -239,15 +242,9 @@ export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
               className="grid grid-rows-7 w-20 shrink-0 text-sm text-zinc-500"
               style={{ rowGap: colGap }}
             >
-              {[
-                "monday",
-                "",
-                "wednesday",
-                "",
-                "friday",
-                "",
-                "sunday",
-              ].map((label, i) => (
+              {weekdayNames(weekStart)
+                .map((name, i) => (i % 2 === 0 ? name.toLowerCase() : ""))
+                .map((label, i) => (
                 <div
                   key={i}
                   className="flex items-center pr-1 whitespace-nowrap leading-none overflow-hidden"
@@ -270,13 +267,7 @@ export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
                   const count = counts.get(key) ?? 0;
                   const isFuture = key > todayKey;
                   const level = isFuture ? 0 : getLevel(count, maxCount);
-                  const label = day.toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    timeZone: "UTC",
-                  });
+                  const label = formatDay(day, dateOrder, { weekday: "short", timeZone: "UTC" });
                   return (
                     <button
                       key={di}
@@ -330,16 +321,10 @@ export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
                   Day Activity
                 </p>
                 <p className="text-xs text-zinc-500 mt-1">
-                  {new Date(`${selectedDay}T00:00:00Z`).toLocaleDateString(
-                    "en-US",
-                    {
-                      weekday: "long",
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      timeZone: "UTC",
-                    },
-                  )}
+                  {formatDay(new Date(`${selectedDay}T00:00:00Z`), dateOrder, {
+                    weekday: "long",
+                    timeZone: "UTC",
+                  })}
                 </p>
               </div>
               <button

@@ -6,7 +6,7 @@ import { GoalsSummary } from "../components/dashboard/GoalsSummary";
 import { InsightCard } from "../components/dashboard/InsightCard";
 import { PersonalBests } from "../components/dashboard/PersonalBests";
 import { TrackCards } from "../components/dashboard/TrackCards";
-import { LoadingSkeleton } from "../components/LoadingSkeleton";
+import { DashboardSkeleton } from "../components/LoadingSkeleton";
 import { buttonClass, EmptyState, StatTile } from "../components/ui";
 import { formatDate, formatNumber, formatRelativeDays, signed } from "../utils/format";
 import { canWrite, useCurrentUser } from "../hooks/useAuth";
@@ -46,7 +46,7 @@ export function DashboardPage() {
     };
   }, [results, profile]);
 
-  if (resultsQuery.isLoading) return <LoadingSkeleton />;
+  if (resultsQuery.isLoading) return <DashboardSkeleton />;
   if (resultsQuery.isError)
     return (
       <EmptyState title="Failed to load results">

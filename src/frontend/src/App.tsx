@@ -1,7 +1,10 @@
 import { Outlet } from "@tanstack/react-router";
 import { TopNav } from "./components/TopNav";
+import { useDatePreferences } from "./hooks/useDatePreferences";
 
 function App() {
+  const { dateOrder, weekStart } = useDatePreferences();
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -15,7 +18,8 @@ function App() {
 
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
-          <Outlet />
+          {/* re-mount the page when the date settings change, so dates and weekly stats recompute */}
+          <Outlet key={`${dateOrder}-${weekStart}`} />
         </main>
 
         <footer className="border-t border-zinc-800/50 mt-12"></footer>
