@@ -16,7 +16,7 @@ services:
     environment:
       PUID: ${APPUSER_PUID}
       PGID: ${APPUSER_PGID}
-      TZ: ${TIME_ZONE_VALUE}
+      TZ: ${TIMEZONE_ZONE_VALUE}
       POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
       POSTGRES_USER: "postgres"
