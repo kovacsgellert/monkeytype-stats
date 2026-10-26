@@ -25,9 +25,18 @@
 - add link on my blog pointing to monkeytype-stats
 - implement heatmap similar to MonkeyType original
 - chore: update screenshots in README
+- feat: make the frontend mobile friendly
+- feat: import Monkeytype profile and leaderboard data daily (lifetime stats, streak, rank, speed histogram, official PBs)
+- feat: saved views and goals stored in the database, included in backup/restore
+- feat: admin login with ASP.NET Identity instead of entering the API key in the frontend
+- feat: full frontend redesign: insight dashboard, explorer, goals, community standing and result details
+- feat: date format and first day of the week display settings
+- chore: update README and screenshots for the redesign (all screenshots in SCREENSHOTS.md)
+- release 1.0.0
 
 ## TO DO 🔨
 
+- chore: deploy 1.0.0 to the homelab (typing.kovacsgellert.dev still runs 0.2.2)
 - chore: update postgres and other container versions to latest in the docker-compose file
 - feat: come up with a better way of versioning the container images (one source of truth, reused)
 - feat: standardize error API error response structure and frontend error handling/display
@@ -37,4 +46,3 @@
 - feat: show Hangfire job status and stats on the Settings page
 - feat: implement a DI based way registering API endpoints (Program.cs should only contain something like app.MapApiEndpoints() which should find and add all of them)
 - chore: general code cleanup
-- feat: make the frontend mobile friendly
