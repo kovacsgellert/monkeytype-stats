@@ -7,6 +7,8 @@ namespace MonkeyTypeStats.Api.Features.Results.Import;
 
 public class ImportResultsJob
 {
+    public const HttpStatusCode RateLimitedStatusCode = (HttpStatusCode)479;
+
     private readonly MonkeyTypeApiClient _monkeyTypeApiClient;
     private readonly MonkeyTypeApiResponseLogger _responseLogger;
     private readonly MonkeyTypeStatsDbContext _dbContext;
@@ -25,17 +27,27 @@ public class ImportResultsJob
         _logger = logger;
     }
 
+    /// <summary>Entry point for the recurring job: a MonkeyType rate limit is logged, not thrown.</summary>
     public async Task ExecuteAsync()
     {
-        await ExecuteInternalAsync();
+        try
+        {
+            await ExecuteWithResultAsync();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == RateLimitedStatusCode)
+        {
+            _logger.LogError(
+                ex,
+                "MonkeyType API rate limit exceeded (status code 479). Stopping results import job."
+            );
+        }
     }
 
-    public Task<int> ExecuteWithResultAsync()
-    {
-        return ExecuteInternalAsync();
-    }
-
-    private async Task<int> ExecuteInternalAsync()
+    /// <summary>
+    /// Imports new results and returns how many were added. A MonkeyType rate limit is thrown
+    /// as an <see cref="HttpRequestException"/> with status code 479, so callers can report it.
+    /// </summary>
+    public async Task<int> ExecuteWithResultAsync()
     {
         _logger.LogInformation("Starting daily MonkeyType results import job");
 
@@ -85,15 +97,8 @@ public class ImportResultsJob
 
             return newResults.Count;
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == (HttpStatusCode)479)
-        {
-            _logger.LogError(
-                ex,
-                "MonkeyType API rate limit exceeded (status code 479). Stopping results import job."
-            );
-            return 0;
-        }
         catch (Exception ex)
+            when (ex is not HttpRequestException { StatusCode: RateLimitedStatusCode })
         {
             _logger.LogError(ex, "Failed to import MonkeyType results");
             throw;
