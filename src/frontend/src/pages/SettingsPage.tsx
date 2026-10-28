@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { createBackup, restoreBackup } from "../api/backup";
 import { importResults } from "../api/importResults";
@@ -19,6 +19,7 @@ export function SettingsPage() {
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const appVersionQuery = useAppVersion();
   const { withLogin } = useAuth();
+  const queryClient = useQueryClient();
 
   const createBackupMutation = useMutation({
     mutationFn: () => withLogin("create a backup", createBackup),
@@ -37,6 +38,8 @@ export function SettingsPage() {
   const restoreBackupMutation = useMutation({
     mutationFn: (backupFile: File) => withLogin("restore a backup", () => restoreBackup(backupFile)),
     onSuccess: (data) => {
+      // a restore can add results, profile data, saved views and goals, so refetch everything
+      void queryClient.invalidateQueries();
       setRestoreSuccess("Backup restored successfully.");
       setRestoreDetails(
         `Results: ${data.resultsAdded} added / ${data.resultsSkipped} skipped. Details: ${data.resultDetailsAdded} added / ${data.resultDetailsSkipped} skipped. Logs: ${data.monkeyTypeApiResponseLogAdded} added / ${data.monkeyTypeApiResponseLogSkipped} skipped. Profile data: ${data.profileRecordsAdded} added. Saved views: ${data.savedViewsAdded} added. Goals: ${data.goalsAdded} added.`,
@@ -51,6 +54,9 @@ export function SettingsPage() {
   const importResultsMutation = useMutation({
     mutationFn: () => withLogin("import results", importResults),
     onSuccess: (data) => {
+      void queryClient.invalidateQueries({ queryKey: ["results"] });
+      void queryClient.invalidateQueries({ queryKey: ["monkeytype-profile"] });
+      void queryClient.invalidateQueries({ queryKey: ["leaderboard-history"] });
       setImportMessage(
         `Import complete. Added ${data.resultsAdded} results.${data.profileImported ? " Profile data updated." : " Profile data could not be updated."}`,
       );
