@@ -20,15 +20,15 @@ public class RestoreBackupCommandHandler(MonkeyTypeStatsDbContext dbContext)
         CancellationToken cancellationToken
     )
     {
-        if (string.IsNullOrWhiteSpace(request.BackupJson))
-        {
-            return OperationResult<RestoreBackupResult>.Error("Backup content is required.");
-        }
-
         BackupSnapshot? backup;
         try
         {
-            backup = JsonSerializer.Deserialize<BackupSnapshot>(request.BackupJson, jsonOptions);
+            // deserialize straight from the upload, backups can be too large for a single string
+            backup = await JsonSerializer.DeserializeAsync<BackupSnapshot>(
+                request.BackupStream,
+                jsonOptions,
+                cancellationToken
+            );
         }
         catch (JsonException)
         {

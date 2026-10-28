@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using MonkeyTypeStats.Api.Authentication;
 using MonkeyTypeStats.Api.Common;
 using HttpResults = Microsoft.AspNetCore.Http.Results;
@@ -7,6 +8,9 @@ namespace MonkeyTypeStats.Api.Features.Backup.Restore;
 
 public static class RestoreBackupEndpoint
 {
+    // matches client_max_body_size in the frontend nginx config
+    private const long MaxBackupSizeBytes = 1024L * 1024 * 1024;
+
     public static WebApplication MapRestoreBackupEndpoint(this WebApplication app)
     {
         app.MapPost(
@@ -20,14 +24,14 @@ public static class RestoreBackupEndpoint
                         );
                     }
 
-                    using var stream = backupFile.OpenReadStream();
-                    using var reader = new StreamReader(stream);
-                    var backupJson = await reader.ReadToEndAsync();
-
-                    var result = await mediator.Send(new RestoreBackupCommand(backupJson));
+                    await using var stream = backupFile.OpenReadStream();
+                    var result = await mediator.Send(new RestoreBackupCommand(stream));
                     return result.ToResult();
                 }
             )
+            // Kestrel allows 30 MB and forms 128 MB by default, backups with result details are larger
+            .WithMetadata(new RequestSizeLimitAttribute(MaxBackupSizeBytes))
+            .WithFormOptions(multipartBodyLengthLimit: MaxBackupSizeBytes)
             .DisableAntiforgery()
             .Accepts<IFormFile>("multipart/form-data")
             .WithName("RestoreBackup")
