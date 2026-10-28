@@ -165,10 +165,6 @@ public class MonkeyTypeApiClient
             $"Failed to fetch MonkeyType results from {endpoint}. Status code: {response.StatusCode}. Response content: {content}"
         );
 
-        throw new HttpRequestException(
-            $"Failed to fetch MonkeyType results from {endpoint}.",
-            null,
-            response.StatusCode
-        );
+        throw new MonkeyTypeApiException(endpoint, response.StatusCode, content);
     }
 }
