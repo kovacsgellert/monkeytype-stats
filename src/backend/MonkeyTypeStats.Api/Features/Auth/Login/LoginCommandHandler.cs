@@ -29,11 +29,13 @@ public class LoginCommandHandler(
             return OperationResult.Error(InvalidCredentialsMessage);
         }
 
+        // there is a single admin account, so locking it after failed attempts would let anyone
+        // lock the owner out; brute force is limited by the login rate limiter instead
         var result = await signInManager.PasswordSignInAsync(
             user,
             password,
             isPersistent: true,
-            lockoutOnFailure: true
+            lockoutOnFailure: false
         );
 
         if (result.IsLockedOut)

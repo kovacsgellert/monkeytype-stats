@@ -32,9 +32,6 @@ public static class AuthenticationSetup
             {
                 options.User.RequireUniqueEmail = true;
                 options.Password.RequiredLength = 12;
-                options.Lockout.AllowedForNewUsers = true;
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             })
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<MonkeyTypeStatsDbContext>()
