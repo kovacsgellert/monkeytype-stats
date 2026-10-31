@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using MonkeyTypeStats.Api.Data;
@@ -51,5 +52,41 @@ public class MonkeyTypeApiResponseLogger
         return true;
     }
 
+    /// <summary>
+    /// Logs an error response, so callers that use the log to skip already attempted endpoints
+    /// do not retry it. Bodies that are not a JSON object are wrapped, because the column is jsonb.
+    /// The caller saves the changes.
+    /// </summary>
+    public Task<bool> AddErrorIfChangedAsync(
+        MonkeyTypeApiException exception,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var data = IsJsonObject(exception.Content)
+            ? exception.Content
+            : JsonSerializer.Serialize(
+                new
+                {
+                    statusCode = (int?)exception.StatusCode,
+                    message = exception.Content,
+                    data = (object?)null,
+                }
+            );
+
+        return AddIfChangedAsync(exception.Endpoint, data, cancellationToken);
+    }
+
     private static JsonNode? GetData(string json) => JsonNode.Parse(json)?["data"];
+
+    private static bool IsJsonObject(string json)
+    {
+        try
+        {
+            return JsonNode.Parse(json) is JsonObject;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
 }
