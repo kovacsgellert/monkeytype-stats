@@ -27,6 +27,15 @@ public class GetResultByIdQueryHandler(
             return OperationResult<ResultDetailsDto>.Ok(resultDetail);
         }
 
+        // this endpoint is public, so only call MonkeyType (with the ApeKey) for imported results;
+        // that also keeps arbitrary ids out of the MonkeyType request path and the response log
+        if (!await dbContext.Results.AnyAsync(r => r.Id == request.Id, cancellationToken))
+        {
+            return OperationResult<ResultDetailsDto>.Error(
+                $"Result with id '{request.Id}' not found."
+            );
+        }
+
         var response = await monkeyTypeApiClient.GetResultByIdAsync(request.Id);
 
         // saved on every path, so the hourly details job knows this result was already fetched
