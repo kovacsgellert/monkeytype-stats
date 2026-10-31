@@ -17,6 +17,7 @@ export function SettingsPage() {
   const [restoreSuccess, setRestoreSuccess] = useState<string | null>(null);
   const [restoreDetails, setRestoreDetails] = useState<string | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
   const appVersionQuery = useAppVersion();
   const { withLogin } = useAuth();
 
@@ -72,6 +73,14 @@ export function SettingsPage() {
     setRestoreSuccess(null);
     setRestoreDetails(null);
     restoreBackupMutation.mutate(selectedBackupFile);
+  };
+
+  const selectBackupFile = (file: File | null) => {
+    setSelectedBackupFile(file);
+    setRestoreErrorMessage(null);
+    setRestoreSuccess(null);
+    setRestoreDetails(null);
+    restoreBackupMutation.reset();
   };
 
   const handleImportResults = () => {
@@ -213,20 +222,44 @@ export function SettingsPage() {
             <p className="text-xs text-zinc-500 mt-1">
               Upload the .json file created by the backup tool.
             </p>
-            <label className="mt-4 flex flex-col items-center justify-center gap-3 rounded-xl border border-zinc-700/60 bg-zinc-900/60 px-4 py-6 text-zinc-300 cursor-pointer hover:border-cyan-500/60 hover:text-zinc-100 transition">
+            <label
+              className={`mt-4 flex flex-col items-center justify-center gap-3 rounded-xl border bg-zinc-900/60 px-4 py-6 text-zinc-300 cursor-pointer hover:border-cyan-500/60 hover:text-zinc-100 transition ${
+                isDraggingFile ? "border-cyan-500/80 text-zinc-100" : "border-zinc-700/60"
+              }`}
+              onDragOver={(event) => {
+                // without preventDefault the browser opens the dropped file instead
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "copy";
+                setIsDraggingFile(true);
+              }}
+              onDragLeave={(event) => {
+                // moving over the label's own text also fires dragleave
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                  setIsDraggingFile(false);
+                }
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                setIsDraggingFile(false);
+                const file = event.dataTransfer.files[0];
+                if (!file) return;
+                if (!file.name.toLowerCase().endsWith(".json")) {
+                  selectBackupFile(null);
+                  setRestoreErrorMessage("Backups are .json files.");
+                  return;
+                }
+                if (fileInputRef.current) fileInputRef.current.value = "";
+                selectBackupFile(file);
+              }}
+            >
               <input
                 type="file"
                 className="sr-only"
                 accept=".json"
                 ref={fileInputRef}
-                onChange={(event) => {
-                  const file = event.target.files?.[0] ?? null;
-                  setSelectedBackupFile(file);
-                  setRestoreErrorMessage(null);
-                  setRestoreSuccess(null);
-                  setRestoreDetails(null);
-                  restoreBackupMutation.reset();
-                }}
+                onChange={(event) =>
+                  selectBackupFile(event.target.files?.[0] ?? null)
+                }
               />
               <span className="text-sm font-medium">
                 {selectedBackupFile ? selectedBackupFile.name : "Choose file"}
