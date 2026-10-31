@@ -15,7 +15,19 @@ public class ImportResultsCommandHandler(
         CancellationToken cancellationToken
     )
     {
-        var resultsAdded = await importResultsJob.ExecuteWithResultAsync();
+        int resultsAdded;
+        try
+        {
+            resultsAdded = await importResultsJob.ExecuteWithResultAsync();
+        }
+        catch (HttpRequestException ex)
+            when (ex.StatusCode == ImportResultsJob.RateLimitedStatusCode)
+        {
+            logger.LogWarning(ex, "Manual MonkeyType results import was rate limited");
+            return OperationResult<ImportResultsResponse>.Error(
+                "MonkeyType's API rate limit was reached. Please try again later."
+            );
+        }
 
         // a failed profile import should not hide the results that were imported
         bool profileImported;
