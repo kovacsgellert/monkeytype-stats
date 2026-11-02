@@ -13,7 +13,7 @@ public static class AuthenticationSetup
     {
         var authSettingsSection = builder.Configuration.GetSection(AuthSettings.SectionName);
         builder.Services.Configure<AuthSettings>(authSettingsSection);
-        var authDisabled = authSettingsSection.Get<AuthSettings>()?.Disabled == true;
+        var authEnabled = authSettingsSection.Get<AuthSettings>()?.Enabled != false;
 
         builder.Services.Configure<AdminOptions>(
             builder.Configuration.GetSection(AdminOptions.SectionName)
@@ -75,7 +75,7 @@ public static class AuthenticationSetup
                 AuthPolicies.Admin,
                 policy =>
                 {
-                    if (authDisabled)
+                    if (!authEnabled)
                     {
                         policy.RequireAssertion(_ => true);
                         return;
