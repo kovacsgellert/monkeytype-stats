@@ -4,8 +4,8 @@ export interface CurrentUser {
   isAuthenticated: boolean;
   email: string | null;
   isAdmin: boolean;
-  /** The server runs without any auth; everyone can change data. */
-  authDisabled: boolean;
+  /** False when the server runs without any auth; everyone can change data. */
+  authEnabled: boolean;
 }
 
 export interface LoginRequest {

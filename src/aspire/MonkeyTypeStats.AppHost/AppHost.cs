@@ -19,9 +19,9 @@ var apeKey = builder.AddParameter("monkeytype-ape-key", secret: true);
 var apiKey = builder.AddParameter("monkeytype-stats-api-key", secret: true);
 var adminEmail = builder.AddParameter("monkeytype-stats-admin-email");
 var adminPassword = builder.AddParameter("monkeytype-stats-admin-password", secret: true);
-var authDisabled = builder.AddParameter(
-    "monkeytype-stats-auth-disabled",
-    "false",
+var authEnabled = builder.AddParameter(
+    "monkeytype-stats-auth-enabled",
+    "true",
     publishValueAsDefault: true
 );
 
@@ -34,7 +34,7 @@ var api = builder
     .WithEnvironment("MonkeyTypeStatsApiKey", apiKey)
     .WithEnvironment("Admin__Email", adminEmail)
     .WithEnvironment("Admin__Password", adminPassword)
-    .WithEnvironment("Auth__Disabled", authDisabled)
+    .WithEnvironment("Auth__Enabled", authEnabled)
     .WithRemoteImageTag("1.0.2");
 
 var frontend = builder

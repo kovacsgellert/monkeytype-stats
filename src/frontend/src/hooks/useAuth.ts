@@ -16,7 +16,7 @@ export function useCurrentUser() {
 
 /** True when the user may change data: logged in as admin, or the server runs without auth. */
 export function canWrite(user: CurrentUser | undefined) {
-  return !!user && (user.authDisabled || user.isAdmin);
+  return !!user && (!user.authEnabled || user.isAdmin);
 }
 
 export function useLoginMutation() {
