@@ -9,6 +9,10 @@ updates:
       nuget:
         patterns:
           - "*"
+    ignore:
+      # 12.5.0 is the last Apache-2.0 release; 13+ requires a commercial license
+      - dependency-name: "MediatR"
+        versions: [">= 13.0.0"]
 
   - package-ecosystem: "npm"
     directory: "/src/frontend"
