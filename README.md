@@ -74,6 +74,7 @@ There is exactly one admin account and no registration:
 - `MONKEYTYPE_STATS_ADMIN_EMAIL` / `MONKEYTYPE_STATS_ADMIN_PASSWORD`: the admin account is created from these on first boot. Changing the email later renames the existing admin.
 - The password is only applied when the account is created. To change it, update `MONKEYTYPE_STATS_ADMIN_PASSWORD`, set `MONKEYTYPE_STATS_ADMIN_RESET_PASSWORD=true` for one restart, then set it back to `false`.
 - `MONKEYTYPE_STATS_AUTH_ENABLED=false` turns off login and API key protection completely. Only use this for a stack that is not reachable from the internet.
+- `MONKEYTYPE_STATS_HANGFIRE_DASHBOARD_ENABLED=true` serves the Hangfire dashboard at `/hangfire` on the API (defaults to `false`). Hangfire only allows local requests to it by default.
 
 Example deployment: [typing.kovacsgellert.dev](https://typing.kovacsgellert.dev)
 
