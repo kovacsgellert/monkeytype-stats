@@ -91,6 +91,10 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+}
+
+if (app.Configuration.GetValue<bool>("Hangfire:DashboardEnabled"))
+{
     app.MapHangfireDashboard();
 }
 
