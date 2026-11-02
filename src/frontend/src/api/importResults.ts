@@ -14,7 +14,7 @@ export async function importResults(): Promise<ImportResultsResponse> {
   if (response.status === 401) {
     throw new UnauthorizedError();
   }
-  let payload: OperationResult<ImportResultsResponse> | null = null;
+  let payload: OperationResult<ImportResultsResponse> | null;
 
   try {
     payload = (await response.json()) as OperationResult<ImportResultsResponse>;
