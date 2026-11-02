@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: "docker.io/library/postgres:17.6"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: "unless-stopped"
+  monkeytype-stats-api:
+    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-api:1.0.2"
+    environment:
+      ConnectionStrings__monkeytype-stats-db: "Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=monkeytype-stats-db"
+      MonkeyTypeApi__ApeKey: "${MONKEYTYPE_APE_KEY}"
+      Admin__Email: "${MONKEYTYPE_STATS_ADMIN_EMAIL}"
+      Admin__Password: "${MONKEYTYPE_STATS_ADMIN_PASSWORD}"
+    depends_on:
+      - postgres
+    restart: "unless-stopped"
+  monkeytype-stats-frontend:
+    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-frontend:1.0.2"
+    environment:
+      MONKEYTYPE_STATS_FRONTEND_PORT: "3000"
+      MONKEYTYPE_STATS_API_HTTP: "http://monkeytype-stats-api:8080"
+    ports:
+      - "3001:3000"
+    depends_on:
+      - monkeytype-stats-api
+    restart: "unless-stopped"
+volumes:
+  postgres-data:
