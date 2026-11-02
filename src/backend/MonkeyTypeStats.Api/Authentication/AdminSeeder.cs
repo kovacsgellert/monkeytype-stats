@@ -14,10 +14,10 @@ public class AdminSeeder(
 {
     public async Task SeedAsync()
     {
-        if (authSettings.Value.Disabled)
+        if (!authSettings.Value.Enabled)
         {
             logger.LogWarning(
-                "Authentication is disabled (Auth:Disabled=true). All endpoints are publicly accessible; do not expose this instance to the internet."
+                "Authentication is disabled (Auth:Enabled=false). All endpoints are publicly accessible; do not expose this instance to the internet."
             );
             return;
         }

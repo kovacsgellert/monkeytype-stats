@@ -64,6 +64,8 @@ The main goals of this project are:
 
 Before deployment adjust the image versions in the docker-compose.yaml to use the latest images and set up the variables in the .env file.
 
+If you just want the app running, use the minimal [docker-compose.minimal.yaml](compose/docker-compose.minimal.yaml) and [.env.minimal.example](compose/.env.minimal.example) instead. It has only Postgres, the API and the frontend (no Aspire dashboard, no OpenTelemetry) and four variables. Copy `.env.minimal.example` to `.env`, fill it in, run `docker compose -f docker-compose.minimal.yaml up -d` and open http://localhost:3001.
+
 Changing data (goals, saved views, imports, backups) requires logging in as the admin, and the Settings page is only visible once you're logged in. The API key from MONKEYTYPE_STATS_API_KEY still works for scripts and the Bruno collection.
 
 ### Admin login
@@ -73,7 +75,7 @@ There is exactly one admin account and no registration:
 
 - `MONKEYTYPE_STATS_ADMIN_EMAIL` / `MONKEYTYPE_STATS_ADMIN_PASSWORD`: the admin account is created from these on first boot. Changing the email later renames the existing admin.
 - The password is only applied when the account is created. To change it, update `MONKEYTYPE_STATS_ADMIN_PASSWORD`, set `MONKEYTYPE_STATS_ADMIN_RESET_PASSWORD=true` for one restart, then set it back to `false`.
-- `MONKEYTYPE_STATS_AUTH_DISABLED=true` turns off login and API key protection completely. Only use this for a stack that is not reachable from the internet.
+- `MONKEYTYPE_STATS_AUTH_ENABLED=false` turns off login and API key protection completely. Only use this for a stack that is not reachable from the internet.
 - `MONKEYTYPE_STATS_HANGFIRE_DASHBOARD_ENABLED=true` serves the Hangfire dashboard at `/hangfire` on the API (defaults to `false`). Hangfire only allows local requests to it by default.
 
 Example deployment: [typing.kovacsgellert.dev](https://typing.kovacsgellert.dev)

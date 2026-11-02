@@ -30,7 +30,7 @@ export function UserMenu() {
   const user = currentUser.data;
   if (!user) return null;
 
-  if (user.authDisabled) {
+  if (!user.authEnabled) {
     return (
       <span
         title="Login is turned off on this server, so anyone who can open this page can change data."

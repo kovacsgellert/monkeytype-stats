@@ -16,10 +16,10 @@ public class GetCurrentUserQueryHandler(
         CancellationToken cancellationToken
     )
     {
-        if (authSettings.Value.Disabled)
+        if (!authSettings.Value.Enabled)
         {
             return Task.FromResult(
-                OperationResult<CurrentUserDto>.Ok(new CurrentUserDto(false, null, true, true))
+                OperationResult<CurrentUserDto>.Ok(new CurrentUserDto(false, null, true, false))
             );
         }
 
@@ -30,9 +30,9 @@ public class GetCurrentUserQueryHandler(
                     true,
                     user.FindFirstValue(ClaimTypes.Email) ?? user.Identity.Name,
                     user.IsInRole(AuthRoles.Admin),
-                    false
+                    true
                 )
-                : new CurrentUserDto(false, null, false, false);
+                : new CurrentUserDto(false, null, false, true);
 
         return Task.FromResult(OperationResult<CurrentUserDto>.Ok(dto));
     }
