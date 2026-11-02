@@ -26,6 +26,8 @@ export function InsightCard({ insight, hero = false }: { insight: Insight; hero?
     <Link
       to="/explorer"
       search={{ ...insight.link.filter, group: insight.link.group }}
+      // links that pick a breakdown dimension land on the Breakdown card
+      hash={insight.link.group ? "breakdown" : undefined}
       className="text-sm font-semibold text-cyan-400 hover:text-cyan-300"
     >
       {insight.link.label} →

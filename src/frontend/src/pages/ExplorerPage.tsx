@@ -1,5 +1,5 @@
-import { getRouteApi, useNavigate } from "@tanstack/react-router";
-import { useCallback, useMemo, useState } from "react";
+import { getRouteApi, useLocation, useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BreakdownTable } from "../components/explorer/BreakdownTable";
 import { ExplorerChart } from "../components/explorer/ExplorerChart";
 import { FilterBar } from "../components/explorer/FilterBar";
@@ -44,6 +44,10 @@ export function ExplorerPage() {
   const currentUser = useCurrentUser();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const resultDetailsQuery = useResultDetails(selectedId);
+
+  const hash = useLocation({ select: (l) => l.hash });
+  const filterBarRef = useRef<HTMLDivElement>(null);
+  const breakdownRef = useRef<HTMLDivElement>(null);
 
   const filter = useMemo(() => sanitizeFilter(search as Record<string, unknown>), [search]);
   const tags = profileQuery.data?.tags ?? [];
@@ -120,6 +124,23 @@ export function ExplorerPage() {
     if (window.confirm(`Delete the saved view "${view.name}"?`)) savedViewMutations.remove.mutate(view.id);
   };
 
+  // dashboard links to a breakdown arrive with #breakdown; the card only exists once results load,
+  // and it has to clear the sticky nav (and, from sm up, the sticky filter bar). The scroll margin
+  // also keeps the router's own hash scroll from tucking the card under them.
+  const breakdownReady = !query.isLoading && perf.length > 0;
+  useEffect(() => {
+    const breakdown = breakdownRef.current;
+    if (hash !== "breakdown" || !breakdownReady || !breakdown) return;
+    const nav = document.querySelector("header");
+    const filterBar = filterBarRef.current;
+    const offset =
+      (nav?.offsetHeight ?? 0) +
+      (filterBar && getComputedStyle(filterBar).position === "sticky" ? filterBar.offsetHeight : 0) +
+      16;
+    breakdown.style.scrollMarginTop = `${offset}px`;
+    breakdown.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [hash, breakdownReady]);
+
   const mutationError =
     savedViewMutations.create.error ?? savedViewMutations.remove.error ?? null;
 
@@ -157,7 +178,7 @@ export function ExplorerPage() {
       </div>
 
       {/* sticks right below the 89px nav from sm up; on phones it wraps to several rows, so it scrolls away */}
-      <div className="relative z-10 sm:sticky sm:top-[89px]">
+      <div ref={filterBarRef} className="relative z-10 sm:sticky sm:top-[89px]">
         <FilterBar
           results={results}
           filter={filter}
@@ -245,13 +266,15 @@ export function ExplorerPage() {
                 }
               />
 
-              <BreakdownTable
-                results={perf}
-                allResults={filtered}
-                group={search.group ?? "month"}
-                onGroupChange={(group) => setSearch({ group })}
-                onDrill={(patch) => setSearch(patch)}
-              />
+              <div ref={breakdownRef} id="breakdown">
+                <BreakdownTable
+                  results={perf}
+                  allResults={filtered}
+                  group={search.group ?? "month"}
+                  onGroupChange={(group) => setSearch({ group })}
+                  onDrill={(patch) => setSearch(patch)}
+                />
+              </div>
 
               <ResultsTable
                 key={filterKey(filter)}
