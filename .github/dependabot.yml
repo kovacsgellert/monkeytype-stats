@@ -1,0 +1,50 @@
+version: 2
+updates:
+  # backend packages (Directory.Packages.props) and .NET local tools (.config/dotnet-tools.json)
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      nuget:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "npm"
+    directory: "/src/frontend"
+    schedule:
+      interval: "weekly"
+    groups:
+      npm:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
+    directory: "/src/frontend"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # stay on the current Node LTS line; odd majors are not LTS
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "docker-compose"
+    directory: "/compose"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # postgres major upgrades need a manual dump/restore
+      - dependency-name: "*postgres"
+        update-types: ["version-update:semver-major"]
+      # the app's own images are bumped by the release process
+      - dependency-name: "*monkeytype-stats-api"
+      - dependency-name: "*monkeytype-stats-frontend"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
