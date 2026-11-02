@@ -64,6 +64,8 @@ The main goals of this project are:
 
 Before deployment adjust the image versions in the docker-compose.yaml to use the latest images and set up the variables in the .env file.
 
+If you just want the app running, use the minimal [docker-compose.minimal.yaml](compose/docker-compose.minimal.yaml) and [.env.minimal.example](compose/.env.minimal.example) instead. It has only Postgres, the API and the frontend (no Aspire dashboard, no OpenTelemetry) and four variables. Copy `.env.minimal.example` to `.env`, fill it in, run `docker compose -f docker-compose.minimal.yaml up -d` and open http://localhost:3001.
+
 Changing data (goals, saved views, imports, backups) requires logging in as the admin, and the Settings page is only visible once you're logged in. The API key from MONKEYTYPE_STATS_API_KEY still works for scripts and the Bruno collection.
 
 ### Admin login
