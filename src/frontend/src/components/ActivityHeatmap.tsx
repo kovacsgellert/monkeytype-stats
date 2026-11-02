@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Result } from "../types/result";
 import { useDatePreferences } from "../hooks/useDatePreferences";
@@ -68,7 +68,7 @@ function getLevel(count: number, max: number): number {
 
 export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
   const { dateOrder, weekStart } = useDatePreferences();
-  const [range, setRange] = useState<RangeKey>("12m");
+  const [selectedRange, setRange] = useState<RangeKey>("12m");
 
   // Years with actual activity (UTC), newest first.
   const years = useMemo(() => {
@@ -81,11 +81,7 @@ export function ActivityHeatmap({ results }: ActivityHeatmapProps) {
   }, [results]);
 
   // Dashboard filters can remove the selected year; fall back to 12m then.
-  useEffect(() => {
-    if (range !== "12m" && !years.includes(Number(range))) {
-      setRange("12m");
-    }
-  }, [range, years]);
+  const range = selectedRange !== "12m" && !years.includes(Number(selectedRange)) ? "12m" : selectedRange;
 
   const { weeks, counts, byDay, totalTests } = useMemo(() => {
     const counts = new Map<string, number>();

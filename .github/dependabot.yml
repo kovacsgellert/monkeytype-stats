@@ -9,6 +9,10 @@ updates:
       nuget:
         patterns:
           - "*"
+    ignore:
+      # 12.5.0 is the last Apache-2.0 release; 13+ requires a commercial license
+      - dependency-name: "MediatR"
+        versions: [">= 13.0.0"]
 
   - package-ecosystem: "npm"
     directory: "/src/frontend"
@@ -18,6 +22,10 @@ updates:
       npm:
         patterns:
           - "*"
+    ignore:
+      # typescript-eslint does not support TypeScript 7 yet (peer typescript <6.1.0)
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "docker"
     directory: "/src/frontend"

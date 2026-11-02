@@ -74,14 +74,16 @@ export function ExplorerChart({ results, metric, xAxis, windows, showPbs, showTr
   const active = metrics.find((m) => m.key === metric)!;
 
   const { datasets, xs } = useMemo(() => {
+    const xs: number[] = [];
     let cumulative = 0;
-    const xs = results.map((r, i) => {
-      if (xAxis === "date") return r.date.getTime();
-      if (xAxis === "test") return i + 1;
-      const x = cumulative / 3600;
-      cumulative += recordedSeconds(r);
-      return x;
-    });
+    for (const [i, r] of results.entries()) {
+      if (xAxis === "date") xs.push(r.date.getTime());
+      else if (xAxis === "test") xs.push(i + 1);
+      else {
+        xs.push(cumulative / 3600);
+        cumulative += recordedSeconds(r);
+      }
+    }
     const values = results.map((r) => r[metric]);
     const points = values.map((y, i) => ({ x: xs[i], y }));
 

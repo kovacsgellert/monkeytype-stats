@@ -56,7 +56,7 @@ export async function restoreBackup(
     throw new UnauthorizedError();
   }
 
-  let payload: OperationResult<RestoreBackupResult> | null = null;
+  let payload: OperationResult<RestoreBackupResult> | null;
 
   try {
     payload = (await response.json()) as OperationResult<RestoreBackupResult>;
