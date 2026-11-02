@@ -8,7 +8,7 @@ const API_BASE = "/api";
 
 export async function fetchAppVersion(): Promise<AppVersionResponse> {
   const response = await fetch(`${API_BASE}/version`);
-  let payload: OperationResult<AppVersionResponse> | null = null;
+  let payload: OperationResult<AppVersionResponse> | null;
 
   try {
     payload = (await response.json()) as OperationResult<AppVersionResponse>;

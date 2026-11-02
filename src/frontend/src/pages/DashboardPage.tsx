@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ActivityHeatmap } from "../components/ActivityHeatmap";
 import { CommunityStanding } from "../components/dashboard/CommunityStanding";
 import { GoalsSummary } from "../components/dashboard/GoalsSummary";
@@ -24,6 +24,7 @@ export function DashboardPage() {
   const profileQuery = useProfile();
   const currentUser = useCurrentUser();
   const profile = profileQuery.data;
+  const [now] = useState(() => Date.now());
 
   const insights = useMemo(() => computeInsights({ results, tracks }), [results, tracks]);
 
@@ -74,7 +75,7 @@ export function DashboardPage() {
     );
 
   const lastTest = results[results.length - 1];
-  const daysSinceLast = (Date.now() - lastTest.date.getTime()) / 86_400_000;
+  const daysSinceLast = (now - lastTest.date.getTime()) / 86_400_000;
   const mainTrack = tracks[0];
   const recovery = breakRecovery(tracks);
   const [hero, ...rest] = insights;

@@ -18,6 +18,10 @@ updates:
       npm:
         patterns:
           - "*"
+    ignore:
+      # typescript-eslint does not support TypeScript 7 yet (peer typescript <6.1.0)
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "docker"
     directory: "/src/frontend"
