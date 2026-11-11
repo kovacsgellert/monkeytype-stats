@@ -35,7 +35,7 @@ var api = builder
     .WithEnvironment("Admin__Email", adminEmail)
     .WithEnvironment("Admin__Password", adminPassword)
     .WithEnvironment("Auth__Enabled", authEnabled)
-    .WithRemoteImageTag("1.1.0");
+    .WithRemoteImageTag("1.1.1");
 
 var frontend = builder
     .AddViteApp("monkeytype-stats-frontend", "../../frontend")
@@ -43,6 +43,6 @@ var frontend = builder
     .WithEnvironment("MONKEYTYPE_STATS_FRONTEND_PORT", "3000")
     .WithExternalHttpEndpoints()
     .WithReference(api)
-    .WithRemoteImageTag("1.1.0");
+    .WithRemoteImageTag("1.1.1");
 
 builder.Build().Run();

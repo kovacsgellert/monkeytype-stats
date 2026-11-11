@@ -8,7 +8,7 @@ services:
       - postgres-data:/var/lib/postgresql
     restart: "unless-stopped"
   monkeytype-stats-api:
-    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-api:1.1.0"
+    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-api:1.1.1"
     environment:
       ConnectionStrings__monkeytype-stats-db: "Host=postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=monkeytype-stats-db"
       MonkeyTypeApi__ApeKey: "${MONKEYTYPE_APE_KEY}"
@@ -18,7 +18,7 @@ services:
       - postgres
     restart: "unless-stopped"
   monkeytype-stats-frontend:
-    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-frontend:1.1.0"
+    image: "ghcr.io/kovacsgellert/monkeytype-stats/monkeytype-stats-frontend:1.1.1"
     environment:
       MONKEYTYPE_STATS_FRONTEND_PORT: "3000"
       MONKEYTYPE_STATS_API_HTTP: "http://monkeytype-stats-api:8080"
