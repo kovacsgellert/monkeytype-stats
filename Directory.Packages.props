@@ -4,7 +4,7 @@
     </PropertyGroup>
     <ItemGroup>
         <!-- Backend API -->
-        <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.6.4" />
+        <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.6.5" />
         <PackageVersion Include="Hangfire.AspNetCore" Version="1.8.25" />
         <PackageVersion Include="Hangfire.InMemory" Version="1.0.0" />
         <!-- 12.5.0 is the last Apache-2.0 release; 13+ requires a commercial license. -->
@@ -21,9 +21,9 @@
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" />
         <PackageVersion Include="Scalar.AspNetCore" Version="2.19.0" />
         <!-- Aspire AppHost -->
-        <PackageVersion Include="Aspire.Hosting.Docker" Version="13.6.4" />
-        <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.6.4" />
-        <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.6.4" />
+        <PackageVersion Include="Aspire.Hosting.Docker" Version="13.6.5" />
+        <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.6.5" />
+        <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.6.5" />
         <!-- Aspire ServiceDefaults -->
         <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.11.0" />
         <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.11.0" />
