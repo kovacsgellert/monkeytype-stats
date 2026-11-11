@@ -1,6 +1,6 @@
 services:
   monkeytype-stats-env-dashboard:
-    image: "mcr.microsoft.com/dotnet/aspire-dashboard:13.6.2"
+    image: "mcr.microsoft.com/dotnet/aspire-dashboard:13.6.4"
     environment:
       Dashboard__Frontend__BrowserToken: "${MONKEYTYPE_STATS_ENV_DASHBOARD_BROWSER_TOKEN}"
     ports:
